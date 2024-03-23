@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import os
 
 def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_file: str = "output", new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", links: list[str] = None, link_titles: list[str] = None, write_to_path: bool = False):
     try:
@@ -7,16 +8,18 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
         soup = BeautifulSoup(html_content, "html.parser")
 
         # Find and modify:
-        # | tag                  | Attribute        |
-        # |----------------------|------------------|
-        # | title                | Tab Name         |
-        # | header -> a(second)  | Path to Page     |
-        # | h1                   | Page Title       | 
-        # | nav class="right"    | Page Links       |
-        # | zero-md              | Markdown Content |
+        # | tag                  | Attribute        | Variable
+        # |----------------------|------------------|-----------------------------------------------------
+        # | title                | Tab Name         | new_title
+        # | header -> a(second)  | Path to Page     | path_to_page
+        # | h1                   | Page Title       | new_header
+        # | nav class="right"    | Page Links       | tuple = (links: list[str], link_titles: list[str])
+        # | zero-md              | Markdown Content | output_file OR md_filename, prioritizes md_filename
 
         title_tag = soup.find("title")
         title_tag.string = f"{new_title}  ||  Mike Verwer"
+        h1_tag = soup.find("h1")
+        h1_tag.string = new_header
         zero_md_tag = soup.find("zero-md")
         zero_md_tag["src"] = f"{output_file}.md" if md_filename is None else f"{md_filename}.md"
 
@@ -52,23 +55,34 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
         else:
             print("No links to add.")
         
-        if not path_to_page[0] == '/' or not path_to_page[0] == '\\':
+        if path_to_page[0] == '/' or path_to_page[0] == '\\':
+            pass
+        else:
             path_to_page = "/" + path_to_page
         if write_to_path:
-            output_file = f"outputs{path_to_page}.html"
+            output_file_path = f"outputs{path_to_page}.html"
+            output_directory = os.path.dirname(output_file_path)
+            os.makedirs(output_directory, exist_ok=True)
+            with open(output_file_path, 'w', encoding='utf-8') as output_file:
+                output_file.write(str(soup.prettify()))
         else:
-            output_file = f"outputs/{output_file}.html"
-        # Write the modified HTML content to the output file
-        with open(output_file, "w", encoding="utf-8") as output_file:
-            output_file.write(str(soup.prettify()))
+            output_file_path = f"outputs/{output_file}.html"
+            with open(output_file_path, "w", encoding="utf-8") as output_file:
+                output_file.write(str(soup.prettify()))
 
         print(f"HTML file successfully created and written to {output_file.name}.")
-    except FileNotFoundError:
-        print("Template HTML file not found.")
+    except FileNotFoundError as fe:
+        print(f"File not found.\n{fe}")
     except Exception as e:
         print(f"An error occurred: {e}")
 
-# Example usage:
-html_file_path = "default_page.html"  # Path to your HTML file
-output_file_path = "output"  # Path to the output HTML file
-personal_site(html_file_path, output_file_path, "home", "Home", "/index.html")
+
+def main():
+    # Example usage:
+    html_file_path = "default_page.html"  # Path to your HTML file
+    output_file_path = "output"  # Path to the output HTML file
+    personal_site(html_file_path, output_file_path, "home", "Home", "/index.html")
+
+
+if __name__ == '__main__':
+    main()

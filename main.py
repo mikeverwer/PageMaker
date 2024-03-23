@@ -7,32 +7,32 @@ class InputRow:
         self.master = master
         self.frame = tk.Frame(self.master)
 
-        self.html_filename_label = tk.Label(self.frame, text="HTML Filename, no extension:")
-        self.html_filename_entry = tk.Entry(self.frame, width=30)
+        self.html_filename_label = tk.Label(self.frame, text="HTML Filename\nno extension:")
+        self.html_filename_entry = tk.Entry(self.frame, width=20)
         self.html_filename_label.grid(row=0, column=0, padx=10, pady=0)
         self.html_filename_entry.grid(row=1, column=0, padx=10, pady=5)
 
-        self.md_filename_label = tk.Label(self.frame, text="MD Filename \n(if different from HTML), no extension:")
-        self.md_filename_entry = tk.Entry(self.frame, width=30)
+        self.md_filename_label = tk.Label(self.frame, text="MD Filename\nno extension:")
+        self.md_filename_entry = tk.Entry(self.frame, width=20)
         self.md_filename_label.grid(row=0, column=1, padx=10, pady=0)
         self.md_filename_entry.grid(row=1, column=1, padx=10, pady=5)
 
-        self.names_label = tk.Label(self.frame, text="Names - format: tab name, page title:")
-        self.names_entry = tk.Entry(self.frame, width=35)
+        self.names_label = tk.Label(self.frame, text="Names\nformat: tab name, page title:")
+        self.names_entry = tk.Entry(self.frame, width=30)
         self.names_label.grid(row=0, column=2, padx=10, pady=0)
         self.names_entry.grid(row=1, column=2, padx=10, pady=5,)
 
-        self.path_label = tk.Label(self.frame, text="Site Path - /path/to/file  -  no extensions:")
+        self.path_label = tk.Label(self.frame, text="Site Path - /path/to/file\nno extensions:")
         self.path_entry = tk.Entry(self.frame, width=40)
         self.path_label.grid(row=0, column=3, padx=10, pady=0)
         self.path_entry.grid(row=1, column=3, padx=10, pady=5)
 
-        self.link_labels_label = tk.Label(self.frame, text="Link Labels - separate with \' , \':")
+        self.link_labels_label = tk.Label(self.frame, text="Link Labels\nseparate with \' , \':")
         self.link_labels_entry = tk.Entry(self.frame, width=50)
         self.link_labels_label.grid(row=0, column=4, padx=10, pady=0)
         self.link_labels_entry.grid(row=1, column=4, padx=10, pady=5)
 
-        self.links_label = tk.Label(self.frame, text="Links - separate with \' , \':")
+        self.links_label = tk.Label(self.frame, text="Links - separate with \' , \'\ninclude extensions:")
         self.links_entry = tk.Entry(self.frame, width=50)
         self.links_label.grid(row=0, column=5, padx=10, pady=0)
         self.links_entry.grid(row=1, column=5, padx=10, pady=5)
@@ -77,15 +77,10 @@ class App:
 
         self.add_row_button = tk.Button(self.master, text="Add Row", command=self.add_row)
         self.add_row_button.pack(pady=10)
+        
 
         self.add_row()  # initial row
-        initial_row = self.input_rows[0]
-        ToolTip(initial_row.html_filename_label, "The name of html file to be built.\nexample: index\nNOT: index.html")
-        ToolTip(initial_row.md_filename_label, "Only use if the markdown content file has \na different name than the html name.\nexample: content\nNOT: content.md")
-        ToolTip(initial_row.names_label, "The text displayed on the browser\n tab and the page Heading text.\nexample: about, Page Heading")
-        ToolTip(initial_row.path_label, "The path to the page on the site.\nexample: /assets/docs/example.html")
-        ToolTip(initial_row.link_labels_label, "Text for the page links on the right navbar.\nexample: Link 1, Link 2")
-        ToolTip(initial_row.links_label, "Links for the page links on the right navbar. \nCan inlude a target.\nexample: https://example.com target=_blank, /docs/other_page.html")
+        self.add_initial_row_tooltips()
 
     def create_TopBar_buttons(self):
         # Create your generic buttons here
@@ -98,8 +93,8 @@ class App:
         make_html_button = tk.Button(self.button_frame, text="Make HTML Files", command=self.make_files)
         make_html_button.grid(row=0, column=2, padx=5, pady=5)
 
-        write_to_path = tk.BooleanVar()
-        checkbox = tk.Checkbutton(self.button_frame, text="Write File(s) to Path: ", variable=write_to_path)
+        self.write_to_path = tk.BooleanVar(value=True)
+        checkbox = tk.Checkbutton(self.button_frame, text="Write File(s) to Path: ", variable=self.write_to_path)
         checkbox.grid(row=0, column=3, padx=5, pady=5)
         ToolTip(checkbox, " If selected, the directory structure described \n by the 'Site Path' will be built, and the files    \n will be placed within.                                         ")
     
@@ -117,9 +112,20 @@ class App:
             if link_labels == "":
                 link_labels = None
             if html_filename and len(names) >= 2 and page_path:
-                make.personal_site(template_file_path="default_page.html", output_file=html_filename, md_filename=md_filename, new_title=names[0], new_header=names[1], path_to_page=page_path, links=links, link_titles=link_labels)
+                print(self.write_to_path.get())
+                make.personal_site(template_file_path="default_page.html", output_file=html_filename, md_filename=md_filename, new_title=names[0], 
+                                   new_header=names[1], path_to_page=page_path, links=links, link_titles=link_labels, write_to_path=self.write_to_path.get())
             else:
                 print("Input Error")
+    
+    def add_initial_row_tooltips(self):
+        initial_row = self.input_rows[0]
+        ToolTip(initial_row.html_filename_label, "The name of html file to be built.\nexample: index\nNOT: index.html")
+        ToolTip(initial_row.md_filename_label, "Only use if the markdown content file has \na different name than the html name.\nexample: content\nNOT: content.md")
+        ToolTip(initial_row.names_label, "The text displayed on the browser\n tab and the page Heading text.\nexample: about, Page Heading")
+        ToolTip(initial_row.path_label, "The path to the page on the site.\nexample: /assets/docs/example.html")
+        ToolTip(initial_row.link_labels_label, "Text for the page links on the right navbar.\nexample: Link 1, Link 2")
+        ToolTip(initial_row.links_label, "Links for the page links on the right navbar. \nCan include a target.\nexample: https://example.com target=_blank, /docs/other_page.html")
 
     def add_row(self):
         new_row = InputRow(self.master)
@@ -171,6 +177,8 @@ class App:
                 new_row.link_labels_entry.insert(0, input_data[i].get("link labels", ""))
                 new_row.links_entry.insert(0, input_data[i].get("links", ""))
                 self.input_rows.append(new_row)
+            
+            self.add_initial_row_tooltips()
 
             print("Config loaded successfully.")
         except FileNotFoundError:
