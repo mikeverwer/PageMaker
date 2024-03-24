@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>page || Mike Verwer</title>  <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
-    <style>
-        .container {
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   page  ||  Mike Verwer
+  </title>
+  <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
+  <style>
+   .container {
             margin: 0 auto;
             padding-left: 64px;
             padding-right: 64px;
@@ -89,7 +92,6 @@
             padding: 4px;
             max-width: 100px; /* Adjust as needed */
             height: auto;
-            margin-left: 16px;
             border: 4px solid transparent;
             background-color: none;
         }
@@ -109,50 +111,75 @@
             cursor: none;
             border: none;
         }
-    </style>
-    
-    <script
-        type="module"
-        src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"
-    ></script>
-    
-
-</head>
-<body>
-    <div class="container">
-        <header>
-            <a href="/index.html"> <!-- Replace "/index.html" with the URL of homepage -->
-                <img src="/icon.png" alt="Website Logo">
-            </a>
-            <a href="/docs/about.html"> <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
-                <h1> Page </h1> <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
-            </a>  
-        </header>
-        <nav class="left">
-            <ul>
-                <li><a href="/teaching/teaching_home.html">Teaching</a></li>
-                <li><a href="/programs/programs_home.html">Programs</a></li>
-                <li><a href="https://github.com/mikeverwer/" target="_blank">GitHub</a></li>
-                <li><a href="/youtube/youtube_home.html">Youtube</a></li>
-            </ul>
-        </nav>
-        <nav class="right">  <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
-            <ul>
-            </ul>
-        </nav>
-        <main>
-            <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-            <!-- Lightweight client-side loader that feature-detects and load polyfills only when necessary -->
-            <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2/webcomponents-loader.min.js"></script>
-        
-            <!-- Load the element definition -->
-            <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@1/src/zero-md.min.js"></script>
-            <!-- Simply set the `src` attribute to your MD file and win -->
-            <zero-md src="content.md"></zero-md>  <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
-        </main>
-        <a href="/password.html"> 
-            <img class="bottom-right-image" src="/golden rectangle.png" alt="Golden rectangle">
-        </a>
-    </div>
-</body>
+  </style>
+  <script src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js" type="module">
+  </script>
+ </head>
+ <body>
+  <div class="container">
+   <header>
+    <a href="/index.html">
+     <!-- Replace "/index.html" with the URL of homepage -->
+     <img alt="Website Logo" src="/icon.png"/>
+    </a>
+    <a href="/page.html">
+     <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
+     <h1>
+      Page
+     </h1>
+     <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
+    </a>
+   </header>
+   <nav class="left">
+    <ul>
+     <li>
+      <a href="/teaching/teaching_home.html">
+       Teaching
+      </a>
+     </li>
+     <li>
+      <a href="/programs/programs_home.html">
+       Programs
+      </a>
+     </li>
+     <li>
+      <a href="https://github.com/mikeverwer/" target="_blank">
+       GitHub
+      </a>
+     </li>
+     <li>
+      <a href="/youtube/youtube_home.html">
+       Youtube
+      </a>
+     </li>
+    </ul>
+   </nav>
+   <nav class="right">
+    <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
+    <ul>
+     <li>
+      <a href="">
+      </a>
+     </li>
+    </ul>
+   </nav>
+   <main>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js">
+    </script>
+    <!-- Lightweight client-side loader that feature-detects and load polyfills only when necessary -->
+    <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2/webcomponents-loader.min.js">
+    </script>
+    <!-- Load the element definition -->
+    <script src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@1/src/zero-md.min.js" type="module">
+    </script>
+    <!-- Simply set the `src` attribute to your MD file and win -->
+    <zero-md src="content.md">
+    </zero-md>
+    <!--########## |||||||||||| UPDATE EVERY PAGE |||||||||||| ############-->
+   </main>
+   <a href="/password.html">
+    <img alt="Golden rectangle" class="bottom-right-image" src="/golden-rectangle.png"/>
+   </a>
+  </div>
+ </body>
 </html>
