@@ -1,7 +1,9 @@
 from bs4 import BeautifulSoup
 import os
 
-def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_file: str = "output", new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", links: list[str] = None, link_titles: list[str] = None, write_to_path: bool = False):
+def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_file: str = "output", 
+                  new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", links: list[str] = None, 
+                  link_titles: list[str] = None, write_to_path: bool = False, root: str = "outputs"):
     try:
         with open(template_file_path, "r", encoding="utf-8") as html_file:
             html_content = html_file.read()
@@ -59,8 +61,9 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
             pass
         else:
             path_to_page = "/" + path_to_page
+        path_to_page = path_to_page.split('.')[0]  # trim any extension
         if write_to_path:
-            output_file_path = f"outputs{path_to_page}.html"
+            output_file_path = f"{root}{path_to_page}.html"
             output_directory = os.path.dirname(output_file_path)
             os.makedirs(output_directory, exist_ok=True)
             with open(output_file_path, 'w', encoding='utf-8') as output_file:

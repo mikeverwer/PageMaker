@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog, messagebox
 import json
 import make_html as make
 
@@ -88,17 +89,33 @@ class App:
         save_button.grid(row=0, column=0, padx=5, pady=5)
 
         load_button = tk.Button(self.button_frame, text="  Load Config  ", command=self.load_config)
-        load_button.grid(row=0, column=1, padx=5, pady=5)
+        load_button.grid(row=0, column=1, padx=25, pady=5)
+
+        self.root_dir_entry = tk.Entry(self.button_frame)
+        self.root_dir_entry.grid(row=0, column=2, padx=5, pady=5)
+        root_dir_button = tk.Button(self.button_frame, text="Select Root Directory", command=lambda: self.root_dir_entry.insert(tk.END, filedialog.askdirectory()))
+        root_dir_button.grid(row=1, column=2, padx=5, pady=5)
+
+        self.template_entry = tk.Entry(self.button_frame)
+        self.template_entry.grid(row=0, column=3, padx=5, pady=5)
+        template_button = tk.Button(self.button_frame, text='Select Template File', command=lambda: self.template_entry.insert(tk.END, filedialog.askopenfilename(defaultextension='.html')))
+        template_button.grid(row=1, column=3, padx=5, pady=5)
 
         make_html_button = tk.Button(self.button_frame, text="Make HTML Files", command=self.make_files)
-        make_html_button.grid(row=0, column=2, padx=5, pady=5)
+        make_html_button.grid(row=0, column=4, padx=5, pady=5)
 
         self.write_to_path = tk.BooleanVar(value=True)
         checkbox = tk.Checkbutton(self.button_frame, text="Write File(s) to Path: ", variable=self.write_to_path)
-        checkbox.grid(row=0, column=3, padx=5, pady=5)
+        checkbox.grid(row=0, column=5, padx=5, pady=5)
         ToolTip(checkbox, " If selected, the directory structure described \n by the 'Site Path' will be built, and the files    \n will be placed within.                                         ")
     
     def make_files(self):
+        root_path = self.root_dir_entry.get()
+        if root_path == "":
+            root_path = '/outputs'
+        template_file = self.template_entry.get()
+        if template_file == "":
+            template_file = 'default_page.html'
         for row in self.input_rows:
             html_filename = row.html_filename_entry.get()
             md_filename = row.md_filename_entry.get()
@@ -113,8 +130,8 @@ class App:
                 link_labels = None
             if html_filename and len(names) >= 2 and page_path:
                 print(self.write_to_path.get())
-                make.personal_site(template_file_path="default_page.html", output_file=html_filename, md_filename=md_filename, new_title=names[0], 
-                                   new_header=names[1], path_to_page=page_path, links=links, link_titles=link_labels, write_to_path=self.write_to_path.get())
+                make.personal_site(template_file_path=template_file, output_file=html_filename, md_filename=md_filename, new_title=names[0], 
+                                   new_header=names[1], path_to_page=page_path, links=links, link_titles=link_labels, write_to_path=self.write_to_path.get(), root=root_path)
             else:
                 print("Input Error")
     
@@ -134,7 +151,11 @@ class App:
     def save_config(self):
         config_data = {
             "rows": len(self.input_rows),
-            "input_data": []
+            "input_data": [],
+            'project_data': {
+                "root": self.root_dir_entry.get(),
+                "template": self.template_entry.get()
+            }
         }
 
         for row in self.input_rows:
@@ -144,7 +165,7 @@ class App:
                 "names": row.names_entry.get(),
                 "path": row.path_entry.get(),
                 "link labels": row.link_labels_entry.get(),
-                "links": row.links_entry.get()
+                "links": row.links_entry.get(),
             }
             config_data["input_data"].append(row_data)
 
@@ -161,6 +182,7 @@ class App:
 
             num_rows = config_data.get("rows", 0)
             input_data = config_data.get("input_data", [])
+            project_data = config_data.get("project_data", {})
 
             # Clear existing rows
             for row in self.input_rows:
@@ -177,8 +199,10 @@ class App:
                 new_row.link_labels_entry.insert(0, input_data[i].get("link labels", ""))
                 new_row.links_entry.insert(0, input_data[i].get("links", ""))
                 self.input_rows.append(new_row)
-            
             self.add_initial_row_tooltips()
+            
+            self.root_dir_entry.insert(0, project_data['root'])
+            self.template_entry.insert(0, project_data['template'])
 
             print("Config loaded successfully.")
         except FileNotFoundError:
