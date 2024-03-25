@@ -79,7 +79,6 @@ class App:
         self.add_row_button = tk.Button(self.master, text="Add Row", command=self.add_row)
         self.add_row_button.pack(pady=10)
         
-
         self.add_row()  # initial row
         self.add_initial_row_tooltips()
 
