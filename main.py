@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
+import os
 import json
 import make_html as make
 
@@ -90,14 +91,16 @@ class App:
         load_button = tk.Button(self.button_frame, text="  Load Config  ", command=self.load_config)
         load_button.grid(row=0, column=1, padx=25, pady=5)
 
-        self.root_dir_entry = tk.Entry(self.button_frame)
+        self.root_dir_entry = tk.Entry(self.button_frame, width=30)
         self.root_dir_entry.grid(row=0, column=2, padx=5, pady=5)
-        root_dir_button = tk.Button(self.button_frame, text="Select Root Directory", command=lambda: self.root_dir_entry.insert(tk.END, filedialog.askdirectory()))
+        root_dir_button = tk.Button(self.button_frame, text="Select Root Directory", command=lambda: (self.root_dir_entry.delete(0, tk.END),  # Clear existing text
+                                                                                                      self.root_dir_entry.insert(tk.END, filedialog.askdirectory())))
         root_dir_button.grid(row=1, column=2, padx=5, pady=5)
 
-        self.template_entry = tk.Entry(self.button_frame)
+        self.template_entry = tk.Entry(self.button_frame, width=30)
         self.template_entry.grid(row=0, column=3, padx=5, pady=5)
-        template_button = tk.Button(self.button_frame, text='Select Template File', command=lambda: self.template_entry.insert(tk.END, filedialog.askopenfilename(defaultextension='.html')))
+        template_button = tk.Button(self.button_frame, text='Select Template File', command=lambda: (self.template_entry.delete(0, tk.END),  # Clear existing text
+                                                                                                     self.template_entry.insert(tk.END, filedialog.askopenfilename(defaultextension='.html'))))
         template_button.grid(row=1, column=3, padx=5, pady=5)
 
         make_html_button = tk.Button(self.button_frame, text="Make HTML Files", command=self.make_files)
@@ -128,18 +131,17 @@ class App:
             if link_labels == "":
                 link_labels = None
             if html_filename and len(names) >= 2 and page_path:
-                print(self.write_to_path.get())
-                make.personal_site(template_file_path=template_file, output_file=html_filename, md_filename=md_filename, new_title=names[0], 
+                make.personal_site(template_file_path=template_file, output_filename=html_filename, md_filename=md_filename, new_title=names[0], 
                                    new_header=names[1], path_to_page=page_path, links=links, link_titles=link_labels, write_to_path=self.write_to_path.get(), root=root_path)
             else:
                 print("Input Error")
     
     def add_initial_row_tooltips(self):
         initial_row = self.input_rows[0]
-        ToolTip(initial_row.html_filename_label, "The name of html file to be built.\nexample: index\nNOT: index.html")
-        ToolTip(initial_row.md_filename_label, "Only use if the markdown content file has \na different name than the html name.\nexample: content\nNOT: content.md")
-        ToolTip(initial_row.names_label, "The text displayed on the browser\n tab and the page Heading text.\nexample: about, Page Heading")
-        ToolTip(initial_row.path_label, "The path to the page on the site.\nexample: /assets/docs/example.html")
+        ToolTip(initial_row.html_filename_label, "The name of html file to be built.\n\nexample: index\nNOT: index.html")
+        ToolTip(initial_row.md_filename_label, "Only use if the markdown content file has\na different name than the html name.\n\nexample: content\nNOT: content.md")
+        ToolTip(initial_row.names_label, "The text displayed on the browser,\ntab and the page Heading text.\n\nexample: about, Page Heading")
+        ToolTip(initial_row.path_label, "The path to the page in the directory\nstructure of the site, from root.\nLeave blank or '/' if path is root path.\n\nexample: /assets/docs/")
         ToolTip(initial_row.link_labels_label, "Text for the page links on the right navbar.\nexample: Link 1, Link 2")
         ToolTip(initial_row.links_label, "Links for the page links on the right navbar. \nCan include a target.\nexample: https://example.com target=_blank, /docs/other_page.html")
 
@@ -148,6 +150,8 @@ class App:
         self.input_rows.append(new_row)
 
     def save_config(self):
+        save_file = filedialog.asksaveasfilename(filetypes=[("JSON files", "*.json")], initialdir=os.path.join(os.getcwd(), "configs"))
+        save_file = f"{save_file}.json" if len(save_file.split('.')) < 2 else save_file
         config_data = {
             "rows": len(self.input_rows),
             "input_data": [],
@@ -168,7 +172,7 @@ class App:
             }
             config_data["input_data"].append(row_data)
 
-        with open("config.json", "w") as f:
+        with open(str(save_file), "w") as f:
             json.dump(config_data, f)
 
         print("Config saved successfully.")
@@ -176,7 +180,8 @@ class App:
 
     def load_config(self):
         try:
-            with open("config.json", "r") as f:
+            loaded_config = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")], initialdir=os.path.join(os.getcwd(), "configs"))
+            with open(loaded_config, "r") as f:
                 config_data = json.load(f)
 
             num_rows = config_data.get("rows", 0)

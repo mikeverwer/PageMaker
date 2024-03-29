@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import os
 
-def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_file: str = "output", 
+def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output", 
                   new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", links: list[str] = None, 
                   link_titles: list[str] = None, write_to_path: bool = False, root: str = "outputs"):
     try:
@@ -19,24 +19,27 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
         # | zero-md              | Markdown Content | output_file OR md_filename, prioritizes md_filename
 
         title_tag = soup.find("title")
-        title_tag.string = f"{new_title}  ||  Mike Verwer"
+        if title_tag:
+            title_tag.string = f"{new_title}  ||  Mike Verwer"
         h1_tag = soup.find("h1")
-        h1_tag.string = new_header
+        if h1_tag:
+            h1_tag.string = new_header
         zero_md_tag = soup.find("zero-md")
-        zero_md_tag["src"] = f"{output_file}.md" if md_filename is None else f"{md_filename}.md"
+        if zero_md_tag:
+            zero_md_tag["src"] = f"{output_filename}.md" if md_filename is None else f"{md_filename}.md"
 
         header_tag = soup.find("header")
         if header_tag:
             a_tags = header_tag.find_all("a")
             if len(a_tags) >= 2:
-                a_tags[1]["href"] = f"{path_to_page}.html"
+                a_tags[1]["href"] = f"{path_to_page}.html" if path_to_page != '/index' else '/assets/docs/about.html'
             else:
                 print("There is no second <a> tag within the <header> tag.")
         else:
-            print("No <header> tag found in the HTML document.")
+            print("No <header> tag found in the template.")
 
         nav_tag = soup.find("nav", class_="right")
-        if links is not None:
+        if nav_tag and links is not None:
             ul_tag = nav_tag.find("ul")
             if ul_tag:
                 # Create and append <li> elements with <a> tags to the <ul> tag
@@ -53,27 +56,26 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
                     li_tag.append(a_tag)
                     ul_tag.append(li_tag)
             else:
-                print("No <ul> tag with class='right' found in the HTML document.")
+                print("No <ul> tag with class='right' found in the template.")
         else:
-            print("No links to add.")
+            print("No links to add or no <nav> tag found in the template.")
         
         if path_to_page[0] == '/' or path_to_page[0] == '\\':
             pass
         else:
             path_to_page = "/" + path_to_page
-        path_to_page = path_to_page.split('.')[0]  # trim any extension
         if write_to_path:
-            output_file_path = f"{root}{path_to_page}.html"
+            output_file_path = f"{root}{path_to_page}{output_filename}.html"
             output_directory = os.path.dirname(output_file_path)
             os.makedirs(output_directory, exist_ok=True)
-            with open(output_file_path, 'w', encoding='utf-8') as output_file:
-                output_file.write(str(soup.prettify()))
+            with open(output_file_path, 'w', encoding='utf-8') as output_filename:
+                output_filename.write(str(soup.prettify()))
         else:
-            output_file_path = f"outputs/{output_file}.html"
-            with open(output_file_path, "w", encoding="utf-8") as output_file:
-                output_file.write(str(soup.prettify()))
+            output_file_path = f"outputs/{output_filename}.html"
+            with open(output_file_path, "w", encoding="utf-8") as output_filename:
+                output_filename.write(str(soup.prettify()))
 
-        print(f"HTML file successfully created and written to {output_file.name}.")
+        print(f"HTML file successfully created and written to {output_filename.name}.")
     except FileNotFoundError as fe:
         print(f"File not found.\n{fe}")
     except Exception as e:
