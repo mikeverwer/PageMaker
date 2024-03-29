@@ -74,14 +74,22 @@ class App:
 
         self.button_frame = tk.Frame(self.master)
         self.button_frame.pack(pady=10)
-
         self.create_TopBar_buttons()
 
-        self.add_row_button = tk.Button(self.master, text="Add Row", command=self.add_row)
-        self.add_row_button.pack(pady=10)
+        self.row_buttons_frame = tk.Frame(self.master)
+        self.row_buttons_frame.pack(pady=10)
+        self.create_row_buttons()
         
         self.add_row()  # initial row
         self.add_initial_row_tooltips()
+
+    def create_row_buttons(self):
+        add_row_button = tk.Button(self.row_buttons_frame, text="Add Row", command=self.add_row)
+        add_row_button.grid(row=0, column=0, padx=10, pady=5)
+
+        reset_button = tk.Button(self.row_buttons_frame, text="Reset Rows", command=lambda: (self.reset_rows(), 
+                                                                                             self.add_row()))
+        reset_button.grid(row=0, column=1, padx=10, pady=5)
 
     def create_TopBar_buttons(self):
         # Create your generic buttons here
@@ -112,29 +120,48 @@ class App:
         ToolTip(checkbox, " If selected, the directory structure described \n by the 'Site Path' will be built, and the files    \n will be placed within.                                         ")
     
     def make_files(self):
+        print("Gathering inputs...")
         root_path = self.root_dir_entry.get()
         if root_path == "":
             root_path = '/outputs'
         template_file = self.template_entry.get()
         if template_file == "":
             template_file = 'default_page.html'
-        for row in self.input_rows:
-            html_filename = row.html_filename_entry.get()
-            md_filename = row.md_filename_entry.get()
-            md_filename = None if md_filename == "" else md_filename
-            names = row.names_entry.get().split(", ")
+        for i, row in enumerate(self.input_rows):
+            html_filename: str = row.html_filename_entry.get()
+            md_filename: str = row.md_filename_entry.get()
+            md_filename: str = None if md_filename == "" else md_filename
+            names: list = row.names_entry.get().split(", ")
+            if html_filename == '':
+                print(f"  Input Error.  Missing: HTML Filename in input row {i + 1}. Skipping attempt.")
+                continue
+            else:
+                if len(html_filename.split('.')) > 1:
+                    html_filename = html_filename.split('.')[0]
+            if names == ['']:
+                print(f"  No Names input in the '{html_filename}' row, attempting to make the page anyway.")
+                title = None
+            else:
+                title = names[0]
+            if len(names) < 2:
+                header = None
+            else: 
+                header = names[1]
             page_path = row.path_entry.get()
+            if page_path == "":
+                page_path = '/'
+                print(f"  The path-to-page in the '{html_filename}' row was blank, attempting to make the page anyway.")                
             links = row.links_entry.get().split(", ")
             if links == "":
                 links = None   
             link_labels = row.link_labels_entry.get().split(", ")
             if link_labels == "":
                 link_labels = None
-            if html_filename and len(names) >= 2 and page_path:
-                make.personal_site(template_file_path=template_file, output_filename=html_filename, md_filename=md_filename, new_title=names[0], 
-                                   new_header=names[1], path_to_page=page_path, links=links, link_titles=link_labels, write_to_path=self.write_to_path.get(), root=root_path)
-            else:
-                print("Input Error")
+            print(f"  Attempting to build {html_filename}.html... ", end="")
+            make.personal_site(template_file_path=template_file, output_filename=html_filename, md_filename=md_filename, new_title=title, 
+                                   new_header=header, path_to_page=page_path, links=links, link_titles=link_labels, write_to_path=self.write_to_path.get(), root=root_path)
+            
+        print('No more pages to make.')
     
     def add_initial_row_tooltips(self):
         initial_row = self.input_rows[0]
@@ -148,6 +175,12 @@ class App:
     def add_row(self):
         new_row = InputRow(self.master)
         self.input_rows.append(new_row)
+
+    def reset_rows(self):
+        for row in self.input_rows:
+            row.frame.destroy()
+        self.input_rows = []
+
 
     def save_config(self):
         save_file = filedialog.asksaveasfilename(filetypes=[("JSON files", "*.json")], initialdir=os.path.join(os.getcwd(), "configs"))
@@ -188,10 +221,7 @@ class App:
             input_data = config_data.get("input_data", [])
             project_data = config_data.get("project_data", {})
 
-            # Clear existing rows
-            for row in self.input_rows:
-                row.frame.destroy()
-            self.input_rows = []
+            self.reset_rows()
 
             # Create new rows from config data
             for i in range(num_rows):
@@ -205,6 +235,8 @@ class App:
                 self.input_rows.append(new_row)
             self.add_initial_row_tooltips()
             
+            self.root_dir_entry.delete(0, tk.END)
+            self.template_entry.delete(0, tk.END)
             self.root_dir_entry.insert(0, project_data['root'])
             self.template_entry.insert(0, project_data['template'])
 

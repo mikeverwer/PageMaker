@@ -21,18 +21,29 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
         title_tag = soup.find("title")
         if title_tag:
             title_tag.string = f"{new_title}  ||  Mike Verwer"
+        else:
+            print("No <title> tag found in the template.")
         h1_tag = soup.find("h1")
         if h1_tag:
             h1_tag.string = new_header
+        else:
+            print("No <h1> tag found in the template.")
         zero_md_tag = soup.find("zero-md")
         if zero_md_tag:
             zero_md_tag["src"] = f"{output_filename}.md" if md_filename is None else f"{md_filename}.md"
+        else:
+            print("No <zero-md> tag found in the template.")
+
+        if path_to_page[0] != '/' and path_to_page[0] != '\\':
+            path_to_page = "/" + path_to_page
+        if len(path_to_page) > 1 and (path_to_page[-1] != '/' and path_to_page[-1] != '\\'):
+            path_to_page = path_to_page + "/"
 
         header_tag = soup.find("header")
         if header_tag:
             a_tags = header_tag.find_all("a")
             if len(a_tags) >= 2:
-                a_tags[1]["href"] = f"{path_to_page}.html" if path_to_page != '/index' else '/assets/docs/about.html'
+                a_tags[1]["href"] = f"{path_to_page}{output_filename}.html" if output_filename != 'index' else '/assets/docs/about.html'
             else:
                 print("There is no second <a> tag within the <header> tag.")
         else:
@@ -49,7 +60,7 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
                         link_portions = href.split()
                         href_portion = link_portions[0]
                         target_portion = link_portions[1].split('=')[1]
-                        a_tag = soup.new_tag("a", href=href_portion, target=target_portion)
+                        a_tag = soup.new_tag("a", href=href_portion, target=f"{target_portion}")
                     else:
                         a_tag = soup.new_tag("a", href=href)
                     a_tag.string = link_titles[i]
