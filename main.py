@@ -120,7 +120,6 @@ class App:
         ToolTip(checkbox, " If selected, the directory structure described \n by the 'Site Path' will be built, and the files    \n will be placed within.                                         ")
     
     def make_files(self):
-        print("Gathering inputs...")
         root_path = self.root_dir_entry.get()
         if root_path == "":
             root_path = '/outputs'
@@ -128,6 +127,7 @@ class App:
         if template_file == "":
             template_file = 'default_page.html'
         for i, row in enumerate(self.input_rows):
+            print("Gathering inputs...")
             html_filename: str = row.html_filename_entry.get()
             md_filename: str = row.md_filename_entry.get()
             md_filename: str = None if md_filename == "" else md_filename
@@ -152,12 +152,12 @@ class App:
                 page_path = '/'
                 print(f"  The path-to-page in the '{html_filename}' row was blank, attempting to make the page anyway.")                
             links = row.links_entry.get().split(", ")
-            if links == "":
-                links = None   
+            if links == [""]:
+                links = None 
             link_labels = row.link_labels_entry.get().split(", ")
-            if link_labels == "":
+            if link_labels == [""]:
                 link_labels = None
-            print(f"  Attempting to build {html_filename}.html... ", end="")
+            print(f"  Attempting to build {html_filename}.html... ")
             make.personal_site(template_file_path=template_file, output_filename=html_filename, md_filename=md_filename, new_title=title, 
                                    new_header=header, path_to_page=page_path, links=links, link_titles=link_labels, write_to_path=self.write_to_path.get(), root=root_path)
             
