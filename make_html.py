@@ -3,7 +3,22 @@ import os
 
 def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output", 
                   new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", links: list[str] = None, 
-                  link_titles: list[str] = None, write_to_path: bool = False, root: str = "outputs"):
+                  link_titles: list[str] = None, index: bool = False, follow: bool = False, write_to_path: bool = False, 
+                  root: str = "outputs"):
+    
+    def add_SEO_meta_content(index, follow):
+        robots_meta_content = ""
+        if index:
+            robots_meta_content += 'index, '
+        else:
+            robots_meta_content += 'noindex, '
+        if follow:
+            robots_meta_content += 'follow'
+        else:
+            robots_meta_content += 'nofollow'
+
+        return robots_meta_content
+    
     step = 0
     try:
         with open(template_file_path, "r", encoding="utf-8") as html_file:
@@ -25,7 +40,7 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
             try:
                 title_tag = soup.find("title")
                 title_tag.string = f"{new_title}  ||  Mike Verwer"
-                print("complete")
+                print("complete.")
             except:
                 print("no <title> tag found in the template.")
         step += 1  # step 2
@@ -35,7 +50,7 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
             try:
                 h1_tag = soup.find("h1")
                 h1_tag.string = new_header
-                print("complete")
+                print("complete.")
             except:
                 print("no <h1> tag found in the template.")
         step += 1  # step 3
@@ -45,7 +60,7 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
             try:
                 zero_md_tag = soup.find("zero-md")
                 zero_md_tag["src"] = f"{output_filename}.md" if md_filename is None else f"{md_filename}.md"
-                print("complete")
+                print("complete.")
             except:
                 print("no <zero-md> tag found in the template.")
         step += 1  # step 4
@@ -63,7 +78,7 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
                 a_tags = header_tag.find_all("a")
                 if len(a_tags) >= 2:
                     a_tags[1]["href"] = f"{path_to_page}{output_filename}.html" if output_filename != 'index' else '/assets/docs/about.html'
-                print("complete")
+                print("complete.")
             except:
                 print("there is no second <a> tag within the <header> tag.")
         step += 1  # step 6
@@ -89,7 +104,7 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
                             a_tag.string = link_titles[i]
                             li_tag.append(a_tag)
                             ul_tag.append(li_tag)
-                        print("complete")
+                        print("complete.")
                     else:
                         print("no <ul> tag with class='right' found in the template.")
             except:
@@ -99,7 +114,7 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
         step += 1  # step 7
         
         # clean up any empty links
-        print("    cleaning up empty links...", end=" ")
+        print("      Cleaning up empty links...", end=" ")
         try:
             empty_links = soup.find_all('li', lambda tag: tag.find('a', href=''))
             if empty_links:
@@ -109,7 +124,31 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
         except:
             print("nothing to clean.")
         step += 1  # step 8
-        
+
+        # meta content        
+        print('    Setting SEO...', end=" ")
+        robots_meta = None
+        try:
+            robots_meta = soup.find('meta', attrs={'name': 'robots'})
+            robots_meta['content'] = add_SEO_meta_content(index, follow)
+        except:
+            print("    no `robots` meta tag, adding... ", end=" ")
+            robots_meta = soup.new_tag('meta')
+            robots_meta['name'] = 'robots'
+            robots_meta['content'] = add_SEO_meta_content(index, follow)
+
+        robots_meta_content: str = robots_meta['content']
+        if 'noindex' in robots_meta_content and 'nofollow' in robots_meta_content:
+            print('this page will NOT be indexed by search engines.')
+        elif 'nofollow' in robots_meta_content:
+            print('page WILL be indexed by search engines.')
+        elif 'noindex' in robots_meta_content:
+            print('links on this page WILL be indexed by search engines.')
+        else:
+            print('page, and links, WILL be indexed by search engines.')
+        step += 1  # step 9
+
+        # Final step - set filepath and write file to path
         if path_to_page[0] == '/' or path_to_page[0] == '\\':
             pass
         else:
@@ -124,7 +163,7 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
             output_file_path = f"outputs/{output_filename}.html"
             with open(output_file_path, "w", encoding="utf-8") as output_filename:
                 output_filename.write(str(soup.prettify()))
-        step += 1  # step 9
+        step += 1  # step 10
 
         print(f"HTML file successfully created and written to {output_filename.name}.")
     except FileNotFoundError as fe:
