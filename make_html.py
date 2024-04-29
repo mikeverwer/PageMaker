@@ -1,25 +1,29 @@
 from bs4 import BeautifulSoup
 import os
 
-def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output", 
-                  new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", links: list[str] = None, 
-                  link_titles: list[str] = None, index: bool = False, follow: bool = False, write_to_path: bool = False, 
-                  root: str = "outputs"):
-    
-    def add_SEO_meta_content(index, follow):
-        robots_meta_content = ""
-        if index:
-            robots_meta_content += 'index, '
-        else:
-            robots_meta_content += 'noindex, '
-        if follow:
-            robots_meta_content += 'follow'
-        else:
-            robots_meta_content += 'nofollow'
 
-        return robots_meta_content
-    
+def add_SEO_meta_content(index, follow):
+    robots_meta_content = ""
+    if index:
+        robots_meta_content += 'index, '
+    else:
+        robots_meta_content += 'noindex, '
+    if follow:
+        robots_meta_content += 'follow'
+    else:
+        robots_meta_content += 'nofollow'
+
+    return robots_meta_content
+
+
+def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output",
+                  description: str = '', new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", 
+                  links: list[str] = None, link_titles: list[str] = None, index: int = 0, follow: int = 0, 
+                  write_to_path: bool = False, root: str = "outputs"):
     step = 0
+    index = False if index == 0 else True
+    follow = False if follow == 0 else True
+    
     try:
         with open(template_file_path, "r", encoding="utf-8") as html_file:
             html_content = html_file.read()
@@ -39,7 +43,7 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
             print("    Adding title...", end=" ")
             try:
                 title_tag = soup.find("title")
-                title_tag.string = f"{new_title}  ||  Mike Verwer"
+                title_tag.string = f"{new_title}"
                 print("complete.")
             except:
                 print("no <title> tag found in the template.")
@@ -128,14 +132,23 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
         # meta content        
         print('    Setting SEO...', end=" ")
         robots_meta = None
+        description_meta = None
         try:
             robots_meta = soup.find('meta', attrs={'name': 'robots'})
             robots_meta['content'] = add_SEO_meta_content(index, follow)
         except:
-            print("    no `robots` meta tag, adding... ", end=" ")
+            print("    no `robots` meta tag in the template, adding... ", end=" ")
             robots_meta = soup.new_tag('meta')
             robots_meta['name'] = 'robots'
             robots_meta['content'] = add_SEO_meta_content(index, follow)
+        try:
+            description_meta = soup.find('meta', attrs={'name': 'description'})
+            description_meta['content'] = description
+        except:
+            print("    no 'description' meta tag in the template, adding... ", end=" ")
+            description_meta = soup.new_tag('meta')
+            description_meta['name'] = 'description'
+            description_meta["content"] = description
 
         robots_meta_content: str = robots_meta['content']
         if 'noindex' in robots_meta_content and 'nofollow' in robots_meta_content:
@@ -165,11 +178,11 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
                 output_filename.write(str(soup.prettify()))
         step += 1  # step 10
 
-        print(f"HTML file successfully created and written to {output_filename.name}.")
+        print(f"HTML file successfully created and written to {output_filename.name}.\n")
     except FileNotFoundError as fe:
         print(f"File not found.\n{fe}")
     except Exception as e:
-        print(f"An error occurred after step {step}: {e}")
+        print(f"An error occurred after step {step}: {e}\n")
 
 
 def main():
