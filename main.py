@@ -1,64 +1,106 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox
+# import tkinter as tk
+from tkinter import *
+from tkinter import ttk
+from tkinter import filedialog
 import os
 import json
 import make_html as make
 
+class DescriptionDialog:
+    def __init__(self, parent_row):
+        self.parent: InputRow = parent_row
+        self.dialog = Toplevel()
+        self.text_entry = Text(self.dialog, height=5, width=30)
+        self.text_entry.pack() 
+        self.text_content = self.text_entry.get("1.0", "end-1c")       
+        accept_button = Button(self.dialog, text="Accept", command=self.accept)
+        accept_button.pack()        
+        cancel_button = Button(self.dialog, text="Cancel", command=self.cancel)
+        cancel_button.pack()
+
+    def check_content(self):
+        if len(self.text_content) > 1:
+            self.parent.description_label_text.set('Desc.  ✓')
+        else:
+            self.parent.description_label_text.set('Desc.  ✗')
+
+    def accept(self):
+        self.text_content = self.text_entry.get("1.0", "end-1c")
+        self.parent.description_content.set(self.text_content)
+        self.check_content()
+        print(self.parent.description_content.get())
+        self.dialog.destroy()
+
+    def cancel(self):
+        self.parent.description_content.set('')
+        self.dialog.destroy()
+
+
 class InputRow:
     def __init__(self, master):
         self.master = master
-        self.frame = tk.Frame(self.master)
+        self.frame = Frame(self.master)
         self.frame.grid_rowconfigure(1, weight=1)
         column_counter = 0
 
-        # small frame to hold the index/follow checkboxes
-        self.miniframe = tk.Frame(self.frame)
-        self.SEO_label = tk.Label(self.frame, text='SEO').grid(row=0, column=column_counter)
-        self.SEO_index = tk.BooleanVar(value=False)
-        self.SEO_follow = tk.BooleanVar(value=False)
-        self.SEO_index_checkbox = tk.Checkbutton(self.miniframe, text='index', variable=self.SEO_index).grid(row=2, column=0, padx=0, pady=0)
-        self.SEO_follow_checkbox = tk.Checkbutton(self.miniframe, text='follow', variable=self.SEO_follow).grid(row=3, column=0, padx=0, pady=0)
+        # small frame to hold the SEO configuration
+        self.SEO_frame = Frame(self.frame)
+        self.SEO_label = Label(self.SEO_frame, text='SEO').grid(row=0, column=column_counter)
+        self.SEO_index = BooleanVar(value=False)
+        self.SEO_follow = BooleanVar(value=False)
+        self.SEO_index_checkbox = Checkbutton(self.SEO_frame, text='index', variable=self.SEO_index).grid(row=2, column=0, padx=0, pady=0)
+        self.SEO_follow_checkbox = Checkbutton(self.SEO_frame, text='follow', variable=self.SEO_follow).grid(row=3, column=0, padx=0, pady=0)        
+        self.description_content = StringVar(value="")
+        self.description_label_text = StringVar(value=f'Desc.  ✗' if self.description_content.get() == "" else f'Desc.  ✓')
+        self.description_label = Label(self.SEO_frame, textvariable=self.description_label_text).grid(row=2, column=1)
+        self.description_button = ttk.Button(self.SEO_frame, textvariable=self.description_label_text, command=self.open_description_dialog)
+        self.description_button.grid(row=3, column=1)
         
-        self.miniframe.grid(column=column_counter, sticky='s')
+        self.SEO_frame.grid(column=column_counter, rowspan=2, sticky='n s')
         column_counter += 1
 
-        self.html_filename_label = tk.Label(self.frame, text="HTML Filename\nno extension:")
-        self.html_filename_entry = tk.Entry(self.frame, width=20)
+        self.html_filename_label = Label(self.frame, text="HTML Filename\nno extension:")
+        self.html_filename_entry = Entry(self.frame, width=20)
         self.html_filename_label.grid(row=0, column=column_counter, padx=10, pady=0)
         self.html_filename_entry.grid(row=1, column=column_counter, padx=10, pady=0)
         column_counter += 1
 
-        self.md_filename_label = tk.Label(self.frame, text="MD Filename\nno extension:")
-        self.md_filename_entry = tk.Entry(self.frame, width=20)
+        self.md_filename_label = Label(self.frame, text="MD Filename\nno extension:")
+        self.md_filename_entry = Entry(self.frame, width=20)
         self.md_filename_label.grid(row=0, column=column_counter, padx=10, pady=0)
         self.md_filename_entry.grid(row=1, column=column_counter, padx=10, pady=0)
         column_counter += 1
 
-        self.names_label = tk.Label(self.frame, text="Names\nformat: tab name, page title:")
-        self.names_entry = tk.Entry(self.frame, width=25)
+        self.names_label = Label(self.frame, text="Names\nformat: tab name, page title:")
+        self.names_entry = Entry(self.frame, width=25)
         self.names_label.grid(row=0, column=column_counter, padx=10, pady=0)
         self.names_entry.grid(row=1, column=column_counter, padx=10, pady=0,)
         column_counter += 1
 
-        self.path_label = tk.Label(self.frame, text="Site Path - /path/to/file\nno extensions:")
-        self.path_entry = tk.Entry(self.frame, width=25)
+        self.path_label = Label(self.frame, text="Site Path - /path/to/file\nno extensions:")
+        self.path_entry = Entry(self.frame, width=25)
         self.path_label.grid(row=0, column=column_counter, padx=10, pady=0)
         self.path_entry.grid(row=1, column=column_counter, padx=10, pady=0)
         column_counter += 1
 
-        self.link_labels_label = tk.Label(self.frame, text="Link Labels\nseparate with \' , \':")
-        self.link_labels_entry = tk.Entry(self.frame, width=40)
+        self.link_labels_label = Label(self.frame, text="Link Labels\nseparate with \' , \':")
+        self.link_labels_entry = Entry(self.frame, width=40)
         self.link_labels_label.grid(row=0, column=column_counter, padx=10, pady=0)
         self.link_labels_entry.grid(row=1, column=column_counter, padx=10, pady=0)
         column_counter += 1
 
-        self.links_label = tk.Label(self.frame, text="Links - separate with \' , \'\ninclude extensions:")
-        self.links_entry = tk.Entry(self.frame, width=60)
+        self.links_label = Label(self.frame, text="Links - separate with \' , \'\ninclude extensions:")
+        self.links_entry = Entry(self.frame, width=60)
         self.links_label.grid(row=0, column=column_counter, padx=10, pady=0)
         self.links_entry.grid(row=1, column=column_counter, padx=10, pady=0)
         column_counter += 1
 
         self.frame.pack()  # re-pack the frame to accommodate for the new row
+        # self.open_description_dialog()
+
+    def open_description_dialog(self):
+        DescriptionDialog(self)
+
 
 class ToolTip:
     def __init__(self, widget, text):
@@ -74,11 +116,11 @@ class ToolTip:
         x += self.widget.winfo_rootx() + 25
         y += self.widget.winfo_rooty() + 25
         
-        self.tooltip = tk.Toplevel(self.widget)
+        self.tooltip = Toplevel(self.widget)
         self.tooltip.wm_overrideredirect(True)
         self.tooltip.wm_geometry(f"+{x}+{y}")
 
-        label = tk.Label(self.tooltip, text=self.text, background='#ffffe0', relief='solid', borderwidth=1)
+        label = Label(self.tooltip, text=self.text, background='#ffffe0', relief='solid', borderwidth=1)
         label.pack()
 
     def hide_tooltip(self, event=None):
@@ -91,11 +133,11 @@ class PageMaker:
         self.master = master
         self.input_rows = []
 
-        self.topbar_button_frame = tk.Frame(self.master)
+        self.topbar_button_frame = Frame(self.master)
         self.topbar_button_frame.pack(pady=10)
         self.create_TopBar_buttons()
 
-        self.row_buttons_frame = tk.Frame(self.master)
+        self.row_buttons_frame = Frame(self.master)
         self.row_buttons_frame.pack(pady=10)
         self.create_row_buttons()
         
@@ -105,38 +147,38 @@ class PageMaker:
 
     def create_TopBar_buttons(self):
         # Create your generic buttons here
-        save_button = tk.Button(self.topbar_button_frame, text="  Save Config  ", command=self.save_config)
+        save_button = Button(self.topbar_button_frame, text="  Save Config  ", command=self.save_config)
         save_button.grid(row=0, column=0, padx=5, pady=5)
 
-        load_button = tk.Button(self.topbar_button_frame, text="  Load Config  ", command=self.load_config)
+        load_button = Button(self.topbar_button_frame, text="  Load Config  ", command=self.load_config)
         load_button.grid(row=0, column=1, padx=25, pady=5)
 
-        self.root_dir_entry = tk.Entry(self.topbar_button_frame, width=50)
+        self.root_dir_entry = Entry(self.topbar_button_frame, width=50)
         self.root_dir_entry.grid(row=0, column=2, padx=5, pady=5)
-        root_dir_button = tk.Button(self.topbar_button_frame, text="Select Root Directory", command=lambda: (self.root_dir_entry.delete(0, tk.END),  # Clear existing text
-                                                                                                      self.root_dir_entry.insert(tk.END, filedialog.askdirectory())))
+        root_dir_button = Button(self.topbar_button_frame, text="Select Root Directory", command=lambda: (self.root_dir_entry.delete(0, END),  # Clear existing text
+                                                                                                      self.root_dir_entry.insert(END, filedialog.askdirectory())))
         root_dir_button.grid(row=1, column=2, padx=5, pady=5)
 
-        self.template_entry = tk.Entry(self.topbar_button_frame, width=50)
+        self.template_entry = Entry(self.topbar_button_frame, width=50)
         self.template_entry.grid(row=0, column=3, padx=5, pady=5)
-        template_button = tk.Button(self.topbar_button_frame, text='Select Template File', command=lambda: (self.template_entry.delete(0, tk.END),  # Clear existing text
-                                                                                                     self.template_entry.insert(tk.END, filedialog.askopenfilename(defaultextension='.html'))))
+        template_button = Button(self.topbar_button_frame, text='Select Template File', command=lambda: (self.template_entry.delete(0, END),  # Clear existing text
+                                                                                                     self.template_entry.insert(END, filedialog.askopenfilename(defaultextension='.html'))))
         template_button.grid(row=1, column=3, padx=5, pady=5)
 
-        make_html_button = tk.Button(self.topbar_button_frame, text="Make HTML Files", command=self.make_files)
+        make_html_button = Button(self.topbar_button_frame, text="Make HTML Files", command=self.make_files)
         make_html_button.grid(row=0, column=4, padx=5, pady=5)
 
-        self.write_to_path = tk.BooleanVar(value=True)
-        checkbox = tk.Checkbutton(self.topbar_button_frame, text="Write File(s) to Path: ", variable=self.write_to_path)
+        self.write_to_path = BooleanVar(value=True)
+        checkbox = Checkbutton(self.topbar_button_frame, text="Write File(s) to Path: ", variable=self.write_to_path)
         checkbox.grid(row=0, column=5, padx=5, pady=5)
         ToolTip(checkbox, " If selected, the directory structure described \n by the 'Site Path' will be built, and the files    \n will be placed within.                                         ")
 
 
     def create_row_buttons(self):
-        add_row_button = tk.Button(self.row_buttons_frame, text="  Add Row  ", command=self.add_row)
+        add_row_button = Button(self.row_buttons_frame, text="  Add Row  ", command=self.add_row)
         add_row_button.grid(row=0, column=0, padx=10, pady=5)
 
-        reset_button = tk.Button(self.row_buttons_frame, text="Reset Rows", command=lambda: (self.reset_rows(), 
+        reset_button = Button(self.row_buttons_frame, text="Reset Rows", command=lambda: (self.reset_rows(), 
                                                                                              self.add_row()))
         reset_button.grid(row=0, column=1, padx=10, pady=5)
 
@@ -191,7 +233,7 @@ class PageMaker:
     
     def add_initial_row_tooltips(self):
         initial_row = self.input_rows[0]
-        ToolTip(initial_row.miniframe, "Select 'index' if you want search\nengines to find the page.\n\nSelect 'follow' if you want the links\non the page to be indexed as well")
+        ToolTip(initial_row.SEO_frame, "Select 'index' if you want search\nengines to find the page.\n\nSelect 'follow' if you want the links\non the page to be indexed as well")
         ToolTip(initial_row.html_filename_label, "The name of html file to be built.\n\nexample: index\nNOT: index.html")
         ToolTip(initial_row.md_filename_label, "Only use if the markdown content file has\na different name than the html name.\n\nexample: content\nNOT: content.md")
         ToolTip(initial_row.names_label, "The text displayed on the browser,\ntab and the page Heading text.\n\nexample: about, Page Heading")
@@ -272,8 +314,8 @@ class PageMaker:
                 self.input_rows.append(new_row)
             self.add_initial_row_tooltips()
             
-            self.root_dir_entry.delete(0, tk.END)
-            self.template_entry.delete(0, tk.END)
+            self.root_dir_entry.delete(0, END)
+            self.template_entry.delete(0, END)
             self.root_dir_entry.insert(0, project_data['root'])
             self.template_entry.insert(0, project_data['template'])
 
@@ -285,7 +327,7 @@ class PageMaker:
 
 
 def main():
-    root = tk.Tk()
+    root = Tk()
     root.title("WebPage Generator")
     app = PageMaker(root)
     root.mainloop()
