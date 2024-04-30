@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import os
+import datetime
 
 
 def add_SEO_meta_content(index, follow):
@@ -18,7 +19,7 @@ def add_SEO_meta_content(index, follow):
 
 def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output",
                   description: str = '', new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", 
-                  links: list[str] = None, link_titles: list[str] = None, index: int = 0, follow: int = 0, 
+                  links: list[str] = None, link_titles: list[str] = None, index: int = 0, follow: int = 0, priority: float = 0.6,
                   write_to_path: bool = False, root: str = "outputs"):
     step = 0
     index = False if index == 0 else True
@@ -178,7 +179,19 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
                 output_filename.write(str(soup.prettify()))
         step += 1  # step 10
 
+        # Build sitemap_entry
+        page_url = 'https://mikeverwer.github.io'
+        current_date = datetime.date.today()
+        formatted_date = current_date.strftime('%Y-%m-%d')
+        sitemap_entry = f'  <url>\n'
+        sitemap_entry += f'    <loc>{page_url}{path_to_page}.html</loc>\n'
+        sitemap_entry += f'    <lastmod>{formatted_date}</lastmod>\n'
+        sitemap_entry += f'    <changefreq>monthly</changefreq>\n'
+        sitemap_entry += f'    <priority>{priority}</priority>\n'
+        sitemap_entry += f'  </url>\n'
+
         print(f"HTML file successfully created and written to {output_filename.name}.\n")
+        return sitemap_entry
     except FileNotFoundError as fe:
         print(f"File not found.\n{fe}")
     except Exception as e:
