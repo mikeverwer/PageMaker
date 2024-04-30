@@ -163,15 +163,18 @@ class PageMaker:
     def create_TopBar_buttons(self):
         column_counter = 0
         
+        # robots.txt entry
         self.robots_text = Text(self.topbar_button_frame, width=60, height=8, font="Helvetica 9")
         self.robots_text.grid(row=0, column=column_counter, rowspan=8, padx=10)
         self.robots_text.insert(0.1, '# Add content for robots.txt')
         column_counter += 1
 
+        # root directory with write-to-path checkbox
         self.root_dir_entry = ttk.Entry(self.topbar_button_frame, width=50)
         self.root_dir_entry.grid(row=0, column=column_counter, padx=5, pady=5, columnspan=2)
-        root_dir_button = ttk.Button(self.topbar_button_frame, text="Select Root Directory", command=lambda: (self.root_dir_entry.delete(0, END),  # Clear existing text
-                                                                                                      self.root_dir_entry.insert(END, filedialog.askdirectory())))
+        root_dir_button = ttk.Button(self.topbar_button_frame, text="Select Root Directory", command=
+                                     lambda: (self.root_dir_entry.delete(0, END),  # Clear existing text
+                                              self.root_dir_entry.insert(END, filedialog.askdirectory())))
         root_dir_button.grid(row=1, column=column_counter, padx=5)
         column_counter += 1
 
@@ -181,6 +184,7 @@ class PageMaker:
         ToolTip(checkbox, " If selected, the directory structure described \n by the 'Site Path' will be built, and the files    \n will be placed within.                                         ")
         column_counter += 1
 
+        # template HTML file entry
         self.template_entry = ttk.Entry(self.topbar_button_frame, width=50)
         self.template_entry.grid(row=0, column=column_counter, padx=5, pady=5)
         template_button = ttk.Button(self.topbar_button_frame, text='Select Template File', command=lambda: (self.template_entry.delete(0, END),  # Clear existing text
@@ -188,7 +192,7 @@ class PageMaker:
         template_button.grid(row=1, column=column_counter, padx=5, pady=5)
         column_counter += 1
 
-
+        # Save/Load/Make Files buttons
         save_button = ttk.Button(self.topbar_button_frame, text="  Save Config  ", command=self.save_config)
         save_button.grid(row=0, column=column_counter, padx=5, pady=5)
         load_button = ttk.Button(self.topbar_button_frame, text="  Load Config  ", command=self.load_config)
@@ -199,6 +203,7 @@ class PageMaker:
         make_html_button.grid(row=5, column=column_counter, padx=5, pady=5, sticky=S)
         column_counter += 1
 
+        # Add row/Reset row buttons
         row_buttons_frame = ttk.Frame(self.topbar_button_frame)
         row_buttons_frame.grid(row=5, column=0, columnspan=column_counter, sticky=S)
 
