@@ -374,14 +374,13 @@ class PageMaker:
             with open(sitemap_filepath, 'r', encoding='utf-8') as existing_sitemap:
                 self.log('found existing sitemap, updating...', end=' ')
                 content = existing_sitemap.read()
+                content = content.split('</urlset>')[0]
 
                 loc_tag = re.compile(r'<loc>(.*?)</loc>')
                 lastmod_tag = re.compile(r'<lastmod>(.*?)</lastmod>')
                 priority_tag = re.compile(r'<priority>(.*?)</priority>')
 
                 loc_tags = loc_tag.findall(content)
-                # lastmod_tags = lastmod_tag.findall(content)
-                # priority_tags = priority_tag.findall(content)
 
                 for sitemap_page in sitemap_content:
                     page_loc = loc_tag.findall(sitemap_page)[0]
@@ -389,8 +388,6 @@ class PageMaker:
                         url_number = loc_tags.index(page_loc)
                         page_lastmod = lastmod_tag.findall(sitemap_page)[0]
                         page_priority = priority_tag.findall(sitemap_page)[0]
-                        # lastmod_tags[url_number] = page_lastmod
-                        # priority_tags[url_number] = page_priority
 
                         # Update the content
                         start_search = content.find(f"<loc>{page_loc}</loc>")
@@ -404,6 +401,7 @@ class PageMaker:
                             content = content[:priority_start] + f"<priority>{page_priority}</priority>" + content[priority_end:]
                     else:
                         content += sitemap_page
+                content =+ '\n</urlset>'
                 self.sitemap = content
 
         except Exception as e:
