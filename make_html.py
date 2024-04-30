@@ -20,7 +20,7 @@ def add_SEO_meta_content(index, follow):
 def personal_site(template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output",
                   description: str = '', new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", 
                   links: list[str] = None, link_titles: list[str] = None, index: int = 0, follow: int = 0, priority: float = 0.6,
-                  write_to_path: bool = False, root: str = "outputs"):
+                  write_to_path: bool = False, root: str = "outputs", page_type: str = 'Main'):
     step = 0
     index = False if index == 0 else True
     follow = False if follow == 0 else True
@@ -119,11 +119,15 @@ def personal_site(template_file_path: str = "default_page.html", md_filename: st
         step += 1  # step 7
         
         # clean up any empty links
-        print("      Cleaning up empty links...", end=" ")
+        print("      Cleaning up links...", end=" ")
         try:
             empty_links = soup.find_all('li', lambda tag: tag.find('a', href=''))
             if empty_links:
                 for li_tag in empty_links:
+                    li_tag.extract()
+            if page_type == "Article":
+                all_links = soup.find_all('li')
+                for li_tag in all_links:
                     li_tag.extract()
             print("complete.")
         except:

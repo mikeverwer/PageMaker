@@ -28,7 +28,8 @@ class ToolTip:
         self.tooltip.wm_overrideredirect(True)
         self.tooltip.wm_geometry(f"+{x}+{y}")
 
-        label = ttk.Label(self.tooltip, text=self.text, background='#f0f0fa', justify=LEFT, relief='solid', borderwidth=0)
+        label = ttk.Label(self.tooltip, text=self.text, background='#f0f0fa', justify=LEFT, relief='solid',
+                           borderwidth=0)
         label.grid(ipadx=4, ipady=4, sticky=(E, W))
 
     def hide_tooltip(self, event=None):
@@ -45,32 +46,44 @@ class InputRow:
         self.frame.grid_rowconfigure(1, weight=1)
         column_counter = 0
 
-        # Row number and priority
+        # Row number, page type, and priority ---------------------------------------------------------------
         self.row_label = ttk.Label(self.frame, text=str(self.row_number), font='_ 22')
-        self.priority_label = ttk.Label(self.frame, text='Priority:')
-        self.priority_entry = ttk.Entry(self.frame, width=3)
 
-        self.row_label.grid(row=0, column=column_counter, rowspan=2, columnspan=2, sticky=N)
+        self.type_frame = ttk.Frame(self.frame)
+        self.page_type = StringVar(value='Main')
+        self.page_type_label = ttk.Label(self.type_frame, text="Page Type:")
+        self.page_type_combo = ttk.Combobox(self.type_frame, textvariable=self.page_type, width=6)
+        self.page_type_combo['values'] = ["Main", "Article"]
+        self.page_type_combo.state(["readonly"])
+
+        self.priority_label = ttk.Label(self.frame, text='Priority:')
+        self.priority_entry = ttk.Entry(self.frame, width=4)
+        # layout
+        self.row_label.grid(row=0, column=column_counter, rowspan=2, columnspan=1, sticky=(N, W))
+        self.page_type_label.grid(row=0, column=0)
+        self.page_type_combo.grid(row=1, column=0)
+        self.type_frame.grid(row=0, column=1, rowspan=2, sticky=N)
+        # column_counter += 1
         self.priority_label.grid(row=1, column=column_counter)
         column_counter += 1
-        self.priority_entry.grid(row=1, column=column_counter)
+        self.priority_entry.grid(row=1, column=column_counter, padx=1, sticky=W)
         column_counter += 1
 
-        # HTML Filename 
+        # HTML Filename -------------------------------------------------------------------------------------
         self.html_filename_label = ttk.Label(self.frame, text="HTML Filename\nno extension:", justify=CENTER)
         self.html_filename_entry = ttk.Entry(self.frame, width=20)
-        self.html_filename_label.grid(row=0, column=column_counter, padx=10, pady=0)
+        self.html_filename_label.grid(row=0, column=column_counter, padx=10, pady=0, sticky=S)
         self.html_filename_entry.grid(row=1, column=column_counter, padx=10, pady=0)
         column_counter += 1
 
-        # Markdown filename
+        # Markdown filename ---------------------------------------------------------------------------------
         self.md_filename_label = ttk.Label(self.frame, text="MD Filename\nno extension:", justify=CENTER)
         self.md_filename_entry = ttk.Entry(self.frame, width=20)
         self.md_filename_label.grid(row=0, column=column_counter, padx=10, pady=0)
         self.md_filename_entry.grid(row=1, column=column_counter, padx=10, pady=0)
         column_counter += 1
 
-        # SEO configuration
+        # SEO configuration ---------------------------------------------------------------------------------
         self.SEO_frame = ttk.Frame(self.frame)
         self.SEO_frame.grid(row=0, column=column_counter)
         self.SEO_label = ttk.Label(self.SEO_frame, text='SEO').grid(row=0, column=0)
@@ -80,25 +93,25 @@ class InputRow:
         self.SEO_follow_checkbox = Checkbutton(self.SEO_frame, text='follow', variable=self.SEO_follow).grid(row=3, column=0, padx=0, pady=0)    
         self.description_text = Text(self.SEO_frame, width=30, height=4, wrap="word", font="Helvetica 9")
         self.description_text.grid(row=0, column=1, rowspan=4) 
-        self.description_text.insert("0.1", "description")       
+        self.description_text.insert('1.0', "description")       
         self.SEO_frame.grid(column=column_counter, rowspan=2, sticky='n s', padx=4)
         column_counter += 1
 
-        # Page Title and Page Header
+        # Page Title and Page Header ------------------------------------------------------------------------
         self.names_label = ttk.Label(self.frame, text="Names\nformat: tab name, page title:", justify=CENTER)
         self.names_entry = ttk.Entry(self.frame, width=25)
         self.names_label.grid(row=0, column=column_counter, padx=10, pady=0)
         self.names_entry.grid(row=1, column=column_counter, padx=10, pady=0,)
         column_counter += 1
 
-        # Path to page
+        # Path to page --------------------------------------------------------------------------------------
         self.path_label = ttk.Label(self.frame, text="Site Path - /path/to/file\nno extensions:", justify=CENTER)
         self.path_entry = ttk.Entry(self.frame, width=25)
         self.path_label.grid(row=0, column=column_counter, padx=10, pady=0)
         self.path_entry.grid(row=1, column=column_counter, padx=10, pady=0)
         column_counter += 1
 
-        # Links
+        # Links----------------------------------------------------------------------------------------------
         # Right navbar link text
         self.link_labels_label = ttk.Label(self.frame, text="Link\nlabels:", justify=LEFT)
         self.link_labels_entry = ttk.Entry(self.frame, width=100)
@@ -114,24 +127,41 @@ class InputRow:
         self.links_entry.grid(row=1, column=column_counter, padx=1, pady=0)
         column_counter += 1
 
+        # ---------------------------------------------------------------------------------------------------
         self.separator = ttk.Separator(self.frame, orient=HORIZONTAL)
         # self.separator.pack(fill='x', padx=2, pady=1)
         self.separator.grid(row=3, column=0, columnspan=column_counter, sticky="ew", ipadx=4)
+
+        # Dictionary of widgets that need to be saved/loaded
+        # Specify get/set methods with key options: -set, -insert, -text
+        self.widgets = {
+                    "type -set": self.page_type,
+                    "priority -insert": self.priority_entry,
+                    "SEO index -set": self.SEO_index,
+                    "SEO follow -set": self.SEO_follow,
+                    "SEO description -text": self.description_text,
+                    "html filename -insert": self.html_filename_entry,
+                    "md filename -insert": self.md_filename_entry,
+                    "names -insert": self.names_entry,
+                    "path -insert": self.path_entry,
+                    "link labels -insert": self.link_labels_entry,
+                    "links -insert": self.links_entry,
+                }
 
         self.frame.pack(pady=1)  # re-pack the frame to accommodate for the new row
 
 
 class PageMaker:
-    def __init__(self, master):
-
-        self.master = master
+    def __init__(self, root: Tk):
+        self.root: Tk = root
+        self.root.bind('<Button 1>', self.remove_focus)
         self.input_rows = []
 
-        self.topbar_button_frame = Frame(self.master)
+        self.topbar_button_frame = Frame(self.root)
         self.topbar_button_frame.pack(pady=10)
         self.create_TopBar_buttons()
         
-        self.scrollable_canvas = Canvas(master)
+        self.scrollable_canvas = Canvas(root)
         self.canvas_scrollbar = Scrollbar(self.scrollable_canvas, orient="vertical", command=self.scrollable_canvas.yview)
 
         self.scrollable_frame = Frame(self.scrollable_canvas)
@@ -146,11 +176,16 @@ class PageMaker:
 
 
     def on_mouse_wheel(self, event):  # TODO: may not work as a class method with arguments
-        self.scrollable_canvas.yview_scroll(-1 * int(event.delta/120), "units")        
+        self.scrollable_canvas.yview_scroll(-1 * int(event.delta/120), "units")   
+
+    def remove_focus(self, event=None):
+        focused_widget = self.root.focus_get()
+        if focused_widget:
+            focused_widget.focus_set()
 
 
     def add_row(self):
-        new_row = InputRow(self.master, len(self.input_rows) + 1)
+        new_row = InputRow(self.root, len(self.input_rows) + 1)
         self.input_rows.append(new_row)
 
 
@@ -158,6 +193,8 @@ class PageMaker:
         for row in self.input_rows:
             row.frame.destroy()
         self.input_rows = []
+        self.robots_text.delete('1.0', "end")
+        self.robots_text.insert('1.0', '# Add content for robots.txt')
 
 
     def create_TopBar_buttons(self):
@@ -171,7 +208,7 @@ class PageMaker:
 
         # root directory with write-to-path checkbox
         self.root_dir_entry = ttk.Entry(self.topbar_button_frame, width=50)
-        self.root_dir_entry.grid(row=0, column=column_counter, padx=5, pady=5, columnspan=2)
+        self.root_dir_entry.grid(row=0, column=column_counter, padx=5, pady=5, columnspan=2, sticky=S)
         root_dir_button = ttk.Button(self.topbar_button_frame, text="Select Root Directory", command=
                                      lambda: (self.root_dir_entry.delete(0, END),  # Clear existing text
                                               self.root_dir_entry.insert(END, filedialog.askdirectory())))
@@ -186,7 +223,7 @@ class PageMaker:
 
         # template HTML file entry
         self.template_entry = ttk.Entry(self.topbar_button_frame, width=50)
-        self.template_entry.grid(row=0, column=column_counter, padx=5, pady=5)
+        self.template_entry.grid(row=0, column=column_counter, padx=5, pady=5, sticky=S)
         template_button = ttk.Button(self.topbar_button_frame, text='Select Template File', command=lambda: (self.template_entry.delete(0, END),  # Clear existing text
                                                                                                      self.template_entry.insert(END, filedialog.askopenfilename(defaultextension='.html'))))
         template_button.grid(row=1, column=column_counter, padx=5, pady=5)
@@ -212,6 +249,7 @@ class PageMaker:
         reset_button = ttk.Button(row_buttons_frame, text="Reset Rows", command=lambda: (self.reset_rows(), self.add_row(), self.add_initial_row_tooltips()))
         reset_button.grid(row=0, column=1, padx=10, pady=5, sticky=S)
 
+
     def make_files(self):
         root_path = self.root_dir_entry.get()
         if root_path == "":
@@ -228,6 +266,7 @@ class PageMaker:
         for i, row in enumerate(self.input_rows):
             print("Gathering inputs...")
             row: InputRow
+            page_type = row.page_type.get()
             SEO_priority: str = row.priority_entry.get()
             html_filename: str = row.html_filename_entry.get()
             md_filename: str = row.md_filename_entry.get()
@@ -268,7 +307,7 @@ class PageMaker:
             print(f"  Attempting to build {html_filename}.html... ")
             page_sitemap = make.personal_site(template_file_path=template_file, output_filename=html_filename, md_filename=md_filename, description=description,
                                new_title=title, new_header=header, path_to_page=page_path, links=links, link_titles=link_labels, index=SEO_index, 
-                               priority=SEO_priority, follow=SEO_follow, write_to_path=self.write_to_path.get(), root=root_path)
+                               priority=SEO_priority, follow=SEO_follow, write_to_path=self.write_to_path.get(), root=root_path, page_type=page_type)
             if page_sitemap:
                 sitemap_content.append(page_sitemap)
             else:
@@ -324,24 +363,19 @@ class PageMaker:
             "input_data": [],
             'project_data': {
                 "root": self.root_dir_entry.get(),
-                "template": self.template_entry.get()
+                "template": self.template_entry.get(),
+                "robots": self.robots_text.get('1.0', 'end-1c')
             }
         }
 
         for row in self.input_rows:
             row: InputRow
-            row_data = {
-                "priority": row.priority_entry.get(),
-                'SEO index': row.SEO_index.get(),
-                'SEO follow': row.SEO_follow.get(),
-                'SEO description': row.description_text.get('1.0', 'end-1c'),
-                "html filename": row.html_filename_entry.get(),
-                "md filename": row.md_filename_entry.get(),
-                "names": row.names_entry.get(),
-                "path": row.path_entry.get(),
-                "link labels": row.link_labels_entry.get(),
-                "links": row.links_entry.get(),
-            }
+            row_data: dict = {}
+            for name, widget in row.widgets.items():
+                if "-text" in name:
+                    row_data[name] = widget.get('1.0', 'end')
+                else:
+                    row_data[name] = widget.get()
             config_data["input_data"].append(row_data)
 
         with open(str(save_file), "w") as f:
@@ -362,31 +396,37 @@ class PageMaker:
             project_data = config_data.get("project_data", {})
 
             self.reset_rows()
-
             # Create new rows from config data
             for i in range(num_rows):
-                new_row = InputRow(self.master, i + 1)
-                try:
-                    new_row.priority_entry.insert(0, input_data[i].get("priority", ""))
-                    new_row.SEO_index.set(input_data[i].get("SEO index", ""))
-                    new_row.SEO_follow.set(input_data[i].get("SEO follow", ""))
-                    new_row.description_text.insert('end-1c', input_data[i].get("SEO description", ""))
-                except:
-                    print("SEO info not found.")
-                    pass
-                new_row.html_filename_entry.insert(0, input_data[i].get("html filename", ""))
-                new_row.md_filename_entry.insert(0, input_data[i].get("md filename", ""))
-                new_row.names_entry.insert(0, input_data[i].get("names", ""))
-                new_row.path_entry.insert(0, input_data[i].get("path", ""))
-                new_row.link_labels_entry.insert(0, input_data[i].get("link labels", ""))
-                new_row.links_entry.insert(0, input_data[i].get("links", ""))
+                print(f"Building row {i + 1}... ")
+                new_row = InputRow(self.root, i + 1)
+
+                for name, widget in new_row.widgets.items():
+                    try:
+                        data_entry = input_data[i].get(name, "")
+                        if "-text" in name:
+                            widget.delete('1.0', "end")
+                            widget.insert('end-1c', data_entry)
+                        elif "-insert" in name:
+                            widget.insert(0, data_entry)
+                        elif "-set" in name:
+                            widget.set(data_entry)                    
+                    except:
+                        name.split('-')
+                        print(f"  {name[0]} not found.")
+                        pass
+
                 self.input_rows.append(new_row)
+
             self.add_initial_row_tooltips()
-            
+
+            # Site-wide settings:
             self.root_dir_entry.delete(0, END)
             self.template_entry.delete(0, END)
+            self.robots_text.delete('1.0', END)
             self.root_dir_entry.insert(0, project_data['root'])
             self.template_entry.insert(0, project_data['template'])
+            self.robots_text.insert('1.0', project_data['robots'])
 
             print("Config loaded successfully.")
         except FileNotFoundError:
@@ -399,7 +439,7 @@ def main():
     root = Tk()
     root.title("WebPage Generator")
     root.iconbitmap('page-maker-icon.ico')
-    app = PageMaker(root)
+    PageMaker(root)
     root.mainloop()
     
 
