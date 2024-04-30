@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 import os
+import re
 import json
 import make_html as make
 
@@ -157,9 +158,9 @@ class PageMaker:
         self.root.bind('<Button 1>', self.remove_focus)
         self.input_rows = []
 
-        self.topbar_button_frame = Frame(self.root)
-        self.topbar_button_frame.pack(pady=10)
-        self.create_TopBar_buttons()
+        self.topbar_frame = Frame(self.root)
+        self.topbar_frame.pack(pady=10)
+        self.create_TopBar()
         
         self.scrollable_canvas = Canvas(root)
         self.canvas_scrollbar = Scrollbar(self.scrollable_canvas, orient="vertical", command=self.scrollable_canvas.yview)
@@ -194,60 +195,94 @@ class PageMaker:
             row.frame.destroy()
         self.input_rows = []
         self.robots_text.delete('1.0', "end")
-        self.robots_text.insert('1.0', '# Add content for robots.txt')
+        self.robots_text.insert('1.0', '# Add content for robots.txt\nUser-agent: *\nDisallow: /private/')
+        self.root_dir_entry.delete(0, END)
+        self.template_entry.delete(0, END)
+        self.clear_log()
+        
 
 
-    def create_TopBar_buttons(self):
+    def create_TopBar(self):
         column_counter = 0
         
         # robots.txt entry
-        self.robots_text = Text(self.topbar_button_frame, width=60, height=8, font="Helvetica 9")
+        self.robots_text = Text(self.topbar_frame, width=40, height=8, font="Helvetica 9")
         self.robots_text.grid(row=0, column=column_counter, rowspan=8, padx=10)
-        self.robots_text.insert(0.1, '# Add content for robots.txt')
+        self.robots_text.insert(0.1, '# Add content for robots.txt\nUser-agent: *\nDisallow: /private/')
         column_counter += 1
 
         # root directory with write-to-path checkbox
-        self.root_dir_entry = ttk.Entry(self.topbar_button_frame, width=50)
+        self.root_dir_entry = ttk.Entry(self.topbar_frame, width=50)
         self.root_dir_entry.grid(row=0, column=column_counter, padx=5, pady=5, columnspan=2, sticky=S)
-        root_dir_button = ttk.Button(self.topbar_button_frame, text="Select Root Directory", command=
+        root_dir_button = ttk.Button(self.topbar_frame, text="Select Root Directory", command=
                                      lambda: (self.root_dir_entry.delete(0, END),  # Clear existing text
                                               self.root_dir_entry.insert(END, filedialog.askdirectory())))
         root_dir_button.grid(row=1, column=column_counter, padx=5)
         column_counter += 1
 
         self.write_to_path = BooleanVar(value=True)
-        checkbox = Checkbutton(self.topbar_button_frame, text="Write File(s) to Path: ", variable=self.write_to_path)
+        checkbox = Checkbutton(self.topbar_frame, text="Write File(s) to Path: ", variable=self.write_to_path)
         checkbox.grid(row=1, column=column_counter, padx=5, pady=5)
         ToolTip(checkbox, " If selected, the directory structure described \n by the 'Site Path' will be built, and the files    \n will be placed within.                                         ")
         column_counter += 1
 
         # template HTML file entry
-        self.template_entry = ttk.Entry(self.topbar_button_frame, width=50)
+        self.template_entry = ttk.Entry(self.topbar_frame, width=50)
         self.template_entry.grid(row=0, column=column_counter, padx=5, pady=5, sticky=S)
-        template_button = ttk.Button(self.topbar_button_frame, text='Select Template File', command=lambda: (self.template_entry.delete(0, END),  # Clear existing text
+        template_button = ttk.Button(self.topbar_frame, text='Select Template File', command=lambda: (self.template_entry.delete(0, END),  # Clear existing text
                                                                                                      self.template_entry.insert(END, filedialog.askopenfilename(defaultextension='.html'))))
         template_button.grid(row=1, column=column_counter, padx=5, pady=5)
         column_counter += 1
 
         # Save/Load/Make Files buttons
-        save_button = ttk.Button(self.topbar_button_frame, text="  Save Config  ", command=self.save_config)
+        save_button = ttk.Button(self.topbar_frame, text="  Save Config  ", command=self.save_config)
         save_button.grid(row=0, column=column_counter, padx=5, pady=5)
-        load_button = ttk.Button(self.topbar_button_frame, text="  Load Config  ", command=self.load_config)
+        load_button = ttk.Button(self.topbar_frame, text="  Load Config  ", command=self.load_config)
         load_button.grid(row=1, column=column_counter, padx=5, pady=5)
-        small_sep = ttk.Separator(self.topbar_button_frame, orient=HORIZONTAL)
+        small_sep = ttk.Separator(self.topbar_frame, orient=HORIZONTAL)
         small_sep.grid(row=3, column=column_counter, sticky='ew')
-        make_html_button = ttk.Button(self.topbar_button_frame, text="Make HTML Files", command=self.make_files)
+        make_html_button = ttk.Button(self.topbar_frame, text="Make HTML Files", command=self.make_files)
         make_html_button.grid(row=5, column=column_counter, padx=5, pady=5, sticky=S)
         column_counter += 1
 
         # Add row/Reset row buttons
-        row_buttons_frame = ttk.Frame(self.topbar_button_frame)
+        row_buttons_frame = ttk.Frame(self.topbar_frame)
         row_buttons_frame.grid(row=5, column=0, columnspan=column_counter, sticky=S)
 
         add_row_button = ttk.Button(row_buttons_frame, text="  Add Row  ", command=self.add_row)
         add_row_button.grid(row=0, column=0, padx=10, pady=5, sticky=S)
-        reset_button = ttk.Button(row_buttons_frame, text="Reset Rows", command=lambda: (self.reset_rows(), self.add_row(), self.add_initial_row_tooltips()))
+        reset_button = ttk.Button(row_buttons_frame, text="Reset", command=lambda: (self.reset_rows(), self.add_row(), self.add_initial_row_tooltips()))
         reset_button.grid(row=0, column=1, padx=10, pady=5, sticky=S)
+
+        # Logging Text
+        self.logging_text = Text(self.topbar_frame, width=80, height=8, font='Helvetica 9', background="#dcdcdc", wrap='none')
+        self.logging_text.grid(row=0, column=column_counter, rowspan=8, padx=5)
+        self.logging_text.insert('1.0', "Logging Window\n\n")
+        self.logging_text["state"] = "disabled"
+        column_counter += 1
+        clear_log_button = ttk.Button(self.topbar_frame, text='X', command=self.clear_log)
+        clear_log_button.grid(row=0, column=column_counter)
+        clear_log_button.config(width=2)
+
+    def clear_log(self):
+        self.logging_text['state'] = 'normal'
+        self.logging_text.delete('1.0', END)
+        self.logging_text.insert('1.0', "Logging Window\n\n")
+        self.logging_text.see('end')
+        self.logging_text['state'] = 'disabled'
+
+
+    def log(self, message, end=None, route_print=True):
+        log_widget = self.logging_text
+        log_widget['state'] = 'normal'
+        if route_print:
+            print(message, end=end)
+        if end is None:
+            end = '\n'
+        message += end
+        log_widget.insert(END, message)
+        log_widget.see('end')
+        log_widget['state'] = 'disabled'
 
 
     def make_files(self):
@@ -259,12 +294,12 @@ class PageMaker:
         if template_file == "":
             template_file = 'default_page.html'
         
-        sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        self.sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         sitemap_content: list = []
         
-        print()
+        self.log("")
         for i, row in enumerate(self.input_rows):
-            print("Gathering inputs...")
+            self.log("Gathering inputs...")
             row: InputRow
             page_type = row.page_type.get()
             SEO_priority: str = row.priority_entry.get()
@@ -274,7 +309,7 @@ class PageMaker:
             description = row.description_text.get('1.0', 'end-1c')
             names: list = row.names_entry.get().split(", ")
             if html_filename == '':
-                print(f"  Input Error.  Missing: HTML Filename in input row {i + 1}. Skipping attempt.")
+                self.log(f"  Input Error.  Missing: HTML Filename in input row {i + 1}. Skipping attempt.")
                 continue
             else:
                 if len(html_filename.split('.')) > 1:
@@ -284,7 +319,7 @@ class PageMaker:
             else: 
                 SEO_priority = float(SEO_priority)
             if names == ['']:
-                print(f"  No Names input in the '{html_filename}' row, attempting to make the page anyway.")
+                self.log(f"  No Names input in the '{html_filename}' row, attempting to make the page anyway.")
                 title = None
             else:
                 title = names[0]
@@ -295,7 +330,7 @@ class PageMaker:
             page_path = row.path_entry.get()
             if page_path == "":
                 page_path = '/'
-                print(f"  The path-to-page in the '{html_filename}' row was blank, attempting to make the page anyway.")                
+                self.log(f"  The path-to-page in the '{html_filename}' row was blank, attempting to make the page anyway.")                
             links = row.links_entry.get().split(", ")
             if links == [""]:
                 links = None 
@@ -304,43 +339,88 @@ class PageMaker:
                 link_labels = None
             SEO_index = row.SEO_index.get()
             SEO_follow = row.SEO_follow.get()
-            print(f"  Attempting to build {html_filename}.html... ")
-            page_sitemap = make.personal_site(template_file_path=template_file, output_filename=html_filename, md_filename=md_filename, description=description,
+            self.log(f"  Attempting to build {html_filename}.html... ")
+            page = make.PersonalSitePage(template_file_path=template_file, output_filename=html_filename, md_filename=md_filename, description=description,
                                new_title=title, new_header=header, path_to_page=page_path, links=links, link_titles=link_labels, index=SEO_index, 
-                               priority=SEO_priority, follow=SEO_follow, write_to_path=self.write_to_path.get(), root=root_path, page_type=page_type)
-            if page_sitemap:
-                sitemap_content.append(page_sitemap)
+                               priority=SEO_priority, follow=SEO_follow, write_to_path=self.write_to_path.get(), root=root_path, page_type=page_type,
+                               logger=self.logging_text)
+            if page:
+                sitemap_content.append(page.sitemap_entry)
             else:
-                print(f"Failed to get sitemap content for input row {i + 1}")
+                self.log(f"Failed to get sitemap content for input row {i + 1}")
             
-        print('No more pages to make.\nMaking sitemap.xml... ', end='')
-        for sitemap_page in sitemap_content:
-            sitemap += sitemap_page
-        sitemap += '</urlset>'
-
-        sitemap_filepath = f"{root_path}/sitemap.xml"
-        try:
-            os.makedirs(root_path, exist_ok=True)
-            with open(sitemap_filepath, 'w', encoding='utf-8') as output_filename:
-                output_filename.write(str(sitemap))
-            print("complete.")
-        except:
-            print("error: could not make sitemap.")
-            pass
+        self.log('No more pages to make.\nMaking sitemap.xml... ', end='')
+        self.make_sitemap(sitemap_content=sitemap_content, root_path=root_path)
         
-        print('Making robots.txt... ', end="")
+        self.log('Making robots.txt... ', end="")
         robots_filepath = f"{root_path}/robots.txt"
         robots_content: str = self.robots_text.get('1.0', 'end-1c')
         try:
             os.makedirs(root_path, exist_ok=True)
             with open(robots_filepath, 'w', encoding='utf-8') as filename:
                 filename.write(str(robots_content))
-            print('complete.')
+            self.log('complete.')
         except Exception as e:
-            print(f'could not create robots.txt.\n{e}')
+            self.log(f'could not create robots.txt.\n{e}')
             raise
             
-        print("\nProcess complete, your website is built!")
+        self.log("\nProcess complete, your website is built!")
+
+    
+    def make_sitemap(self, sitemap_content, root_path):
+        # grab the content from any existing sitemap and add pages that aren't already in it.
+        sitemap_filepath = f"{root_path}/sitemap.xml"
+        try:
+            with open(sitemap_filepath, 'r', encoding='utf-8') as existing_sitemap:
+                self.log('found existing sitemap, updating...', end=' ')
+                content = existing_sitemap.read()
+
+                loc_tag = re.compile(r'<loc>(.*?)</loc>')
+                lastmod_tag = re.compile(r'<lastmod>(.*?)</lastmod>')
+                priority_tag = re.compile(r'<priority>(.*?)</priority>')
+
+                loc_tags = loc_tag.findall(content)
+                # lastmod_tags = lastmod_tag.findall(content)
+                # priority_tags = priority_tag.findall(content)
+
+                for sitemap_page in sitemap_content:
+                    page_loc = loc_tag.findall(sitemap_page)[0]
+                    if page_loc in loc_tags:  # an existing page was updated, update the contents
+                        url_number = loc_tags.index(page_loc)
+                        page_lastmod = lastmod_tag.findall(sitemap_page)[0]
+                        page_priority = priority_tag.findall(sitemap_page)[0]
+                        # lastmod_tags[url_number] = page_lastmod
+                        # priority_tags[url_number] = page_priority
+
+                        # Update the content
+                        start_search = content.find(f"<loc>{page_loc}</loc>")
+                        if start_search != -1:
+                            lastmod_start = content.find(f"<lastmod>", start_search)
+                            lastmod_end = content.find(f"</lastmod>", lastmod_start) + len("</lastmod>")
+                            priority_start = content.find(f"<priority>", start_search)
+                            priority_end = content.find(f"</priority>", priority_start) + len("</priority>")
+                            
+                            content = content[:lastmod_start] + f"<lastmod>{page_lastmod}</lastmod>" + content[lastmod_end:]
+                            content = content[:priority_start] + f"<priority>{page_priority}</priority>" + content[priority_end:]
+                    else:
+                        content += sitemap_page
+                self.sitemap = content
+
+        except Exception as e:
+            self.log(f'  No current sitemap, building...', end=' ')
+            for sitemap_page in sitemap_content:
+                self.sitemap += sitemap_page
+            self.sitemap += '</urlset>'
+
+        # write to file
+        try:
+            os.makedirs(root_path, exist_ok=True)
+            with open(sitemap_filepath, 'w', encoding='utf-8') as output_filename:
+                output_filename.write(str(self.sitemap))
+            self.log("completed successfully.")
+        except:
+            self.log("error: could not make sitemap.")
+            pass
 
 
     def add_initial_row_tooltips(self):
@@ -381,7 +461,7 @@ class PageMaker:
         with open(str(save_file), "w") as f:
             json.dump(config_data, f)
 
-        print("Config saved successfully.")
+        self.log("Config saved successfully.")
         pass
 
 
@@ -398,7 +478,7 @@ class PageMaker:
             self.reset_rows()
             # Create new rows from config data
             for i in range(num_rows):
-                print(f"Building row {i + 1}... ")
+                self.log(f"Building row {i + 1}... ")
                 new_row = InputRow(self.root, i + 1)
 
                 for name, widget in new_row.widgets.items():
@@ -413,7 +493,7 @@ class PageMaker:
                             widget.set(data_entry)                    
                     except:
                         name.split('-')
-                        print(f"  {name[0]} not found.")
+                        self.log(f"  {name[0]} not found.")
                         pass
 
                 self.input_rows.append(new_row)
@@ -428,11 +508,11 @@ class PageMaker:
             self.template_entry.insert(0, project_data['template'])
             self.robots_text.insert('1.0', project_data['robots'])
 
-            print("Config loaded successfully.")
+            self.log("Config loaded successfully.")
         except FileNotFoundError:
-            print("Config file not found.")
+            self.log("Config file not found.")
         except json.JSONDecodeError:
-            print("Error decoding JSON.")
+            self.log("Error decoding JSON.")
 
 
 def main():
