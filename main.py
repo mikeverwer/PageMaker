@@ -172,7 +172,7 @@ class PageMaker:
         self.input_rows = []
         # Window Creation
         self.build_window()
-        self.root.update_idletasks()
+        self.root.update_idletasks()  # wait until the window is finished
         # Window Position
         screen_width = self.root.winfo_screenwidth()
         window_width = self.root.winfo_width()
@@ -199,57 +199,6 @@ class PageMaker:
 
         self.add_row()  # initial row
         self.add_initial_row_tooltips()
-
-
-    def on_mouse_wheel(self, event):  # TODO: may not work as a class method with arguments
-        self.scrollable_canvas.yview_scroll(-1 * int(event.delta/120), "units")   
-
-
-    def remove_focus(self, event=None):
-        focused_widget = self.root.focus_get()
-        if focused_widget:
-            focused_widget.focus_set()
-
-    
-    def autoload(self, event=None):
-        self.load_config(self.autosave_filepath)
-
-
-    def autosave(self, event=None):
-        self.save_config(self.autosave_filepath, autosave=True)
-        self.schedule_autosave()
-
-
-    def schedule_autosave(self):
-        self.root.after(self.autosave_interval, self.autosave)
-
-
-    def add_row(self):
-        new_row = InputRow(self.root, len(self.input_rows) + 1)
-        self.input_rows.append(new_row)
-
-
-    def reset_rows(self):
-        for row in self.input_rows:
-            row.frame.destroy()
-        self.input_rows = []
-        self.robots_text.delete('1.0', "end")
-        self.robots_text.insert('1.0', '# Add content for robots.txt\nUser-agent: *\nDisallow: /private/')
-        self.root_dir_entry.delete(0, END)
-        self.template_entry.delete(0, END)
-        self.clear_log()
-        
-
-    def add_initial_row_tooltips(self):
-        initial_row: InputRow = self.input_rows[0]
-        ToolTip(initial_row.priority_label, "The priority of the page for web search results.\nShould be a number between 0.0 and 1.0")
-        ToolTip(initial_row.SEO_frame, child='!label', text="Enter the description for the page\nin the text box.\n\nSelect 'index' if you want search\nengines to find the page.\n\nSelect 'follow' if you want the links\non the page to be indexed as well")
-        ToolTip(initial_row.html_filename_label, "The name of html file to be built.\n\nexample: index\nNOT: index.html")
-        ToolTip(initial_row.md_filename_label, "Only use if the markdown content file has\na different name than the html name.\n\nexample: content\nNOT: content.md")
-        ToolTip(initial_row.names_label, "The text displayed on the browser,\ntab and the page Heading text.\n\nexample: about, Page Heading")
-        ToolTip(initial_row.path_label, "The path to the page in the directory\nstructure of the site, from root.\nLeave blank or '/' if path is root path.\n\nexample: /assets/docs/")
-        ToolTip(initial_row.link_labels_label, "Text for the page links on the right navbar.\n\nSeparate with `,`\nexample: Link 1, Link 2")
-        ToolTip(initial_row.links_label, "Links for the page links on the right navbar. \nCan include a target.\n\nSeparate with `,`\nexample: https://example.com target=_blank, /docs/other_page.html")
 
 
     def create_TopBar(self):
@@ -313,6 +262,66 @@ class PageMaker:
         clear_log_button = ttk.Button(self.topbar_frame, text='X', command=self.clear_log)
         clear_log_button.grid(row=0, column=column_counter)
         clear_log_button.config(width=2)
+        
+
+    def add_initial_row_tooltips(self):
+        initial_row: InputRow = self.input_rows[0]
+        ToolTip(initial_row.priority_label, "The priority of the page for web search results.\nShould be a number between 0.0 and 1.0")
+        ToolTip(initial_row.SEO_frame, child='!label', text="Enter the description for the page\nin the text box.\n\nSelect 'index' if you want search\nengines to find the page.\n\nSelect 'follow' if you want the links\non the page to be indexed as well")
+        ToolTip(initial_row.html_filename_label, "The name of html file to be built.\n\nexample: index\nNOT: index.html")
+        ToolTip(initial_row.md_filename_label, "Only use if the markdown content file has\na different name than the html name.\n\nexample: content\nNOT: content.md")
+        ToolTip(initial_row.names_label, "The text displayed on the browser,\ntab and the page Heading text.\n\nexample: about, Page Heading")
+        ToolTip(initial_row.path_label, "The path to the page in the directory\nstructure of the site, from root.\nLeave blank or '/' if path is root path.\n\nexample: /assets/docs/")
+        ToolTip(initial_row.link_labels_label, "Text for the page links on the right navbar.\n\nSeparate with `,`\nexample: Link 1, Link 2")
+        ToolTip(initial_row.links_label, "Links for the page links on the right navbar. \nCan include a target.\n\nSeparate with `,`\nexample: https://example.com target=_blank, /docs/other_page.html")
+
+
+    #  ________ ___  ___  ________   ________ _________  ___  ________  ________   ________      
+    # |\  _____\\  \|\  \|\   ___  \|\   ____\\___   ___\\  \|\   __  \|\   ___  \|\   ____\     
+    # \ \  \__/\ \  \\\  \ \  \\ \  \ \  \___\|___ \  \_\ \  \ \  \|\  \ \  \\ \  \ \  \___|_    
+    #  \ \   __\\ \  \\\  \ \  \\ \  \ \  \       \ \  \ \ \  \ \  \\\  \ \  \\ \  \ \_____  \   
+    #   \ \  \_| \ \  \\\  \ \  \\ \  \ \  \____   \ \  \ \ \  \ \  \\\  \ \  \\ \  \|____|\  \  
+    #    \ \__\   \ \_______\ \__\\ \__\ \_______\  \ \__\ \ \__\ \_______\ \__\\ \__\____\_\  \ 
+    #     \|__|    \|_______|\|__| \|__|\|_______|   \|__|  \|__|\|_______|\|__| \|__|\_________\
+    #                                                                                \|_________|
+
+    def add_row(self):
+        new_row = InputRow(self.root, len(self.input_rows) + 1)
+        self.input_rows.append(new_row)
+
+
+    def on_mouse_wheel(self, event):  # TODO: may not work as a class method with arguments
+        self.scrollable_canvas.yview_scroll(-1 * int(event.delta/120), "units")   
+
+
+    def remove_focus(self, event=None):
+        focused_widget = self.root.focus_get()
+        if focused_widget:
+            focused_widget.focus_set()
+
+    
+    def autoload(self, event=None):
+        self.load_config(self.autosave_filepath)
+
+
+    def autosave(self, event=None):
+        self.save_config(self.autosave_filepath, autosave=True)
+        self.schedule_autosave()
+
+
+    def schedule_autosave(self):
+        self.root.after(self.autosave_interval, self.autosave)
+
+
+    def reset_rows(self):
+        for row in self.input_rows:
+            row.frame.destroy()
+        self.input_rows = []
+        self.robots_text.delete('1.0', "end")
+        self.robots_text.insert('1.0', '# Add content for robots.txt\nUser-agent: *\nDisallow: /private/')
+        self.root_dir_entry.delete(0, END)
+        self.template_entry.delete(0, END)
+        self.clear_log()
 
 
     def get_template(self, event=None):
@@ -341,6 +350,12 @@ class PageMaker:
         log_widget.see('end')
         log_widget['state'] = 'disabled'
 
+
+    # ███    ███  █████  ██   ██ ███████     ███████ ██ ██      ███████ ███████ 
+    # ████  ████ ██   ██ ██  ██  ██          ██      ██ ██      ██      ██      
+    # ██ ████ ██ ███████ █████   █████       █████   ██ ██      █████   ███████ 
+    # ██  ██  ██ ██   ██ ██  ██  ██          ██      ██ ██      ██           ██ 
+    # ██      ██ ██   ██ ██   ██ ███████     ██      ██ ███████ ███████ ███████ 
 
     def make_files(self):
         root_path = self.root_dir_entry.get()
@@ -423,7 +438,13 @@ class PageMaker:
             
         self.log("\nProcess complete, your website is built!")
 
-    
+
+    # ███████ ██ ████████ ███████ ███    ███  █████  ██████  
+    # ██      ██    ██    ██      ████  ████ ██   ██ ██   ██ 
+    # ███████ ██    ██    █████   ██ ████ ██ ███████ ██████  
+    #      ██ ██    ██    ██      ██  ██  ██ ██   ██ ██      
+    # ███████ ██    ██    ███████ ██      ██ ██   ██ ██       
+     
     def make_sitemap(self, sitemap_content, root_path):
         # grab the content from any existing sitemap and add pages that aren't already in it.
         sitemap_filepath = f"{root_path}/sitemap.xml"
@@ -486,6 +507,12 @@ class PageMaker:
             self.log("error: could not make sitemap.")
             pass
 
+
+    # ███████  █████  ██    ██ ███████         ██     ██       ██████   █████  ██████  
+    # ██      ██   ██ ██    ██ ██             ██      ██      ██    ██ ██   ██ ██   ██ 
+    # ███████ ███████ ██    ██ █████         ██       ██      ██    ██ ███████ ██   ██ 
+    #      ██ ██   ██  ██  ██  ██           ██        ██      ██    ██ ██   ██ ██   ██ 
+    # ███████ ██   ██   ████   ███████     ██         ███████  ██████  ██   ██ ██████  
 
     def save_config(self, save_file=None, autosave=False):
         if save_file is None:
