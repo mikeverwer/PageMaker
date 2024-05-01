@@ -155,7 +155,15 @@ class InputRow:
 class PageMaker:
     def __init__(self, root: Tk):
         self.root: Tk = root
+        self.autosave_interval = 300_000  # 5 minutes in milliseconds
+        configs_directory = os.path.join(os.getcwd(), "configs")
+        self.autosave_filepath = os.path.join(configs_directory, "autosave.json")
+        
         self.root.bind('<Button 1>', self.remove_focus)
+        self.root.bind('<Control-s>', self.save_config)
+        self.root.bind("<Control-l>", self.load_config)
+        self.root.bind("<F5>", self.autosave)
+        self.root.bind("<F8>", self.autoload)
         self.input_rows = []
 
         self.topbar_frame = Frame(self.root)
@@ -175,14 +183,30 @@ class PageMaker:
         self.add_row()  # initial row
         self.add_initial_row_tooltips()
 
+        self.schedule_autosave()
+
 
     def on_mouse_wheel(self, event):  # TODO: may not work as a class method with arguments
         self.scrollable_canvas.yview_scroll(-1 * int(event.delta/120), "units")   
+
 
     def remove_focus(self, event=None):
         focused_widget = self.root.focus_get()
         if focused_widget:
             focused_widget.focus_set()
+
+    
+    def autoload(self, event=None):
+        self.load_config(self.autosave_filepath)
+
+
+    def autosave(self, event=None):
+        self.save_config(self.autosave_filepath, autosave=True)
+        self.schedule_autosave()
+
+
+    def schedule_autosave(self):
+        self.root.after(self.autosave_interval, self.autosave)
 
 
     def add_row(self):
@@ -201,10 +225,21 @@ class PageMaker:
         self.clear_log()
         
 
+    def add_initial_row_tooltips(self):
+        initial_row: InputRow = self.input_rows[0]
+        ToolTip(initial_row.priority_label, "The priority of the page for web search results.\nShould be a number between 0.0 and 1.0")
+        ToolTip(initial_row.SEO_frame, child='!label', text="Enter the description for the page\nin the text box.\n\nSelect 'index' if you want search\nengines to find the page.\n\nSelect 'follow' if you want the links\non the page to be indexed as well")
+        ToolTip(initial_row.html_filename_label, "The name of html file to be built.\n\nexample: index\nNOT: index.html")
+        ToolTip(initial_row.md_filename_label, "Only use if the markdown content file has\na different name than the html name.\n\nexample: content\nNOT: content.md")
+        ToolTip(initial_row.names_label, "The text displayed on the browser,\ntab and the page Heading text.\n\nexample: about, Page Heading")
+        ToolTip(initial_row.path_label, "The path to the page in the directory\nstructure of the site, from root.\nLeave blank or '/' if path is root path.\n\nexample: /assets/docs/")
+        ToolTip(initial_row.link_labels_label, "Text for the page links on the right navbar.\n\nSeparate with `,`\nexample: Link 1, Link 2")
+        ToolTip(initial_row.links_label, "Links for the page links on the right navbar. \nCan include a target.\n\nSeparate with `,`\nexample: https://example.com target=_blank, /docs/other_page.html")
+
 
     def create_TopBar(self):
         column_counter = 0
-        
+
         # robots.txt entry
         self.robots_text = Text(self.topbar_frame, width=40, height=8, font="Helvetica 9")
         self.robots_text.grid(row=0, column=column_counter, rowspan=8, padx=10)
@@ -421,21 +456,11 @@ class PageMaker:
             pass
 
 
-    def add_initial_row_tooltips(self):
-        initial_row: InputRow = self.input_rows[0]
-        ToolTip(initial_row.priority_label, "The priority of the page for web search results.\nShould be a number between 0.0 and 1.0")
-        ToolTip(initial_row.SEO_frame, child='!label', text="Enter the description for the page\nin the text box.\n\nSelect 'index' if you want search\nengines to find the page.\n\nSelect 'follow' if you want the links\non the page to be indexed as well")
-        ToolTip(initial_row.html_filename_label, "The name of html file to be built.\n\nexample: index\nNOT: index.html")
-        ToolTip(initial_row.md_filename_label, "Only use if the markdown content file has\na different name than the html name.\n\nexample: content\nNOT: content.md")
-        ToolTip(initial_row.names_label, "The text displayed on the browser,\ntab and the page Heading text.\n\nexample: about, Page Heading")
-        ToolTip(initial_row.path_label, "The path to the page in the directory\nstructure of the site, from root.\nLeave blank or '/' if path is root path.\n\nexample: /assets/docs/")
-        ToolTip(initial_row.link_labels_label, "Text for the page links on the right navbar.\n\nSeparate with `,`\nexample: Link 1, Link 2")
-        ToolTip(initial_row.links_label, "Links for the page links on the right navbar. \nCan include a target.\n\nSeparate with `,`\nexample: https://example.com target=_blank, /docs/other_page.html")
+    def save_config(self, save_file=None, autosave=False):
+        if save_file is None:
+            save_file = filedialog.asksaveasfilename(filetypes=[("JSON files", "*.json")], initialdir=os.path.join(os.getcwd(), "configs"))
+            save_file = f"{save_file}.json" if len(save_file.split('.')) < 2 else save_file  # make sure the file extension is present
 
-
-    def save_config(self):
-        save_file = filedialog.asksaveasfilename(filetypes=[("JSON files", "*.json")], initialdir=os.path.join(os.getcwd(), "configs"))
-        save_file = f"{save_file}.json" if len(save_file.split('.')) < 2 else save_file
         config_data = {
             "rows": len(self.input_rows),
             "input_data": [],
@@ -451,7 +476,7 @@ class PageMaker:
             row_data: dict = {}
             for name, widget in row.widgets.items():
                 if "-text" in name:
-                    row_data[name] = widget.get('1.0', 'end')
+                    row_data[name] = widget.get('1.0', 'end-1c')
                 else:
                     row_data[name] = widget.get()
             config_data["input_data"].append(row_data)
@@ -459,16 +484,21 @@ class PageMaker:
         with open(str(save_file), "w") as f:
             json.dump(config_data, f)
 
-        self.log("Config saved successfully.")
-        pass
+        if autosave:
+            self.log("Autosaved.")
+        else:
+            self.log(f"Config saved successfully to {f.name}.")
 
 
-    def load_config(self):
+    def load_config(self, filename=None):
         try:
-            loaded_config = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")], initialdir=os.path.join(os.getcwd(), "configs"))
+            if filename:
+                loaded_config = filename
+            else:
+                loaded_config = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")], initialdir=os.path.join(os.getcwd(), "configs"))
             with open(loaded_config, "r") as f:
                 config_data = json.load(f)
-
+            self.log(f"Loading '{loaded_config}'...")
             num_rows = config_data.get("rows", 0)
             input_data = config_data.get("input_data", [])
             project_data = config_data.get("project_data", {})
@@ -507,6 +537,7 @@ class PageMaker:
             self.robots_text.insert('1.0', project_data['robots'])
 
             self.log("Config loaded successfully.")
+            self.autosave()
         except FileNotFoundError:
             self.log("Config file not found.")
         except json.JSONDecodeError:
