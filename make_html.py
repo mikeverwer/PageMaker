@@ -48,6 +48,7 @@ class PersonalSitePage:
             self.step = self.add_links(links=links, link_titles=link_titles)           
             self.step = self.clean_links(page_type=page_type)
             # meta content 
+            self.step = self.set_styles(page_type=page_type)
             self.step = self.change_meta(index=index, follow=follow, description=description)
             # Final step before sitemap - set filepath and write file to path
             self.step, path_to_page = self.make_html_file(write_to_path=write_to_path, path_to_page=path_to_page, root=root, output_filename=output_filename)
@@ -169,6 +170,18 @@ class PersonalSitePage:
                 self.log(f"no links in the template:")
         else:
             self.log('nothing to clean.')
+        return self.step + 1
+    
+    def set_styles(self, page_type):
+        self.log("    Setting page CSS...", end=" ")
+        style_tag = self.soup.find('link')
+        href = ""
+        if page_type == 'Main':
+            href = "/styles/main_page_styles.css"
+        elif page_type == "Article":
+            href = "/styles/article_page_styles.css"
+        style_tag["href"] = href
+        self.log("complete.")
         return self.step + 1
     
     def change_meta(self, index, follow, description):

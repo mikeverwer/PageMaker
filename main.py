@@ -154,23 +154,40 @@ class InputRow:
 
 class PageMaker:
     def __init__(self, root: Tk):
+        # Root Configuration
         self.root: Tk = root
-        self.autosave_interval = 300_000  # 5 minutes in milliseconds
-        configs_directory = os.path.join(os.getcwd(), "configs")
-        self.autosave_filepath = os.path.join(configs_directory, "autosave.json")
-        
+        self.root.title("WebPage Generator")
+        self.root.iconbitmap('page-maker-icon.ico')
+        # Keybinds
         self.root.bind('<Button 1>', self.remove_focus)
         self.root.bind('<Control-s>', self.save_config)
         self.root.bind("<Control-l>", self.load_config)
         self.root.bind("<F5>", self.autosave)
         self.root.bind("<F8>", self.autoload)
+        # Globals
+        self.autosave_interval = 300_000  # 5 minutes in milliseconds
+        self.cwd = os.getcwd()
+        self.configs_directory = os.path.join(self.cwd, "configs")
+        self.autosave_filepath = os.path.join(self.configs_directory, "autosave.json")
         self.input_rows = []
+        # Window Creation
+        self.build_window()
+        self.root.update_idletasks()
+        # Window Position
+        screen_width = self.root.winfo_screenwidth()
+        window_width = self.root.winfo_width()
+        x_pos = (screen_width - window_width) // 2  # not working, centers the left edge
+        self.root.geometry(f"+{x_pos}+25")
 
+        self.schedule_autosave()
+
+
+    def build_window(self):
         self.topbar_frame = Frame(self.root)
         self.topbar_frame.pack(pady=10)
         self.create_TopBar()
         
-        self.scrollable_canvas = Canvas(root)
+        self.scrollable_canvas = Canvas(self.root)
         self.canvas_scrollbar = Scrollbar(self.scrollable_canvas, orient="vertical", command=self.scrollable_canvas.yview)
 
         self.scrollable_frame = Frame(self.scrollable_canvas)
@@ -182,8 +199,6 @@ class PageMaker:
 
         self.add_row()  # initial row
         self.add_initial_row_tooltips()
-
-        self.schedule_autosave()
 
 
     def on_mouse_wheel(self, event):  # TODO: may not work as a class method with arguments
@@ -299,6 +314,13 @@ class PageMaker:
         clear_log_button.grid(row=0, column=column_counter)
         clear_log_button.config(width=2)
 
+
+    def get_template(self, event=None):
+
+        self.template_entry.delete(0, END),  # Clear existing text
+        self.template_entry.insert(END, filedialog.askopenfilename(defaultextension='.html'))
+
+
     def clear_log(self):
         self.logging_text['state'] = 'normal'
         self.logging_text.delete('1.0', END)
@@ -405,19 +427,27 @@ class PageMaker:
     def make_sitemap(self, sitemap_content, root_path):
         # grab the content from any existing sitemap and add pages that aren't already in it.
         sitemap_filepath = f"{root_path}/sitemap.xml"
+        step = 0
+        loop = 0
         try:
+            step += 1
             with open(sitemap_filepath, 'r', encoding='utf-8') as existing_sitemap:
+                step += 1
                 self.log('found existing sitemap, updating...', end=' ')
                 content = existing_sitemap.read()
                 content = content.split('</urlset>')[0]
 
+                step += 1
                 loc_tag = re.compile(r'<loc>(.*?)</loc>')
                 lastmod_tag = re.compile(r'<lastmod>(.*?)</lastmod>')
                 priority_tag = re.compile(r'<priority>(.*?)</priority>')
 
                 loc_tags = loc_tag.findall(content)
 
+                step += 1
+                loop = 0
                 for sitemap_page in sitemap_content:
+                    loop += 1
                     page_loc = loc_tag.findall(sitemap_page)[0]
                     if page_loc in loc_tags:  # an existing page was updated, update the contents
                         url_number = loc_tags.index(page_loc)
@@ -431,16 +461,17 @@ class PageMaker:
                             lastmod_end = content.find(f"</lastmod>", lastmod_start) + len("</lastmod>")
                             priority_start = content.find(f"<priority>", start_search)
                             priority_end = content.find(f"</priority>", priority_start) + len("</priority>")
-                            
+
                             content = content[:lastmod_start] + f"<lastmod>{page_lastmod}</lastmod>" + content[lastmod_end:]
                             content = content[:priority_start] + f"<priority>{page_priority}</priority>" + content[priority_end:]
                     else:
                         content += sitemap_page
-                content =+ '\n</urlset>'
+                content += '\n</urlset>'
                 self.sitemap = content
 
         except Exception as e:
             self.log(f'  No current sitemap, building...', end=' ')
+            print(f"Failed at {step = }, {loop = }\n{e}")
             for sitemap_page in sitemap_content:
                 self.sitemap += sitemap_page
             self.sitemap += '</urlset>'
@@ -537,7 +568,7 @@ class PageMaker:
             self.robots_text.insert('1.0', project_data['robots'])
 
             self.log("Config loaded successfully.")
-            self.autosave()
+            # self.autosave()
         except FileNotFoundError:
             self.log("Config file not found.")
         except json.JSONDecodeError:
@@ -546,8 +577,6 @@ class PageMaker:
 
 def main():
     root = Tk()
-    root.title("WebPage Generator")
-    root.iconbitmap('page-maker-icon.ico')
     PageMaker(root)
     root.mainloop()
     
