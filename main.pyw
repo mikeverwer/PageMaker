@@ -4,7 +4,330 @@ from tkinter import filedialog
 import os
 import re
 import json
-import make_html as make
+from bs4 import BeautifulSoup
+import datetime
+
+
+def main():
+    root = Tk()
+    PageMaker(root)
+    root.mainloop()
+
+
+#  /$$$$$$$                                                             /$$  /$$$$$$  /$$   /$$               /$$$$$$$                              
+# | $$__  $$                                                           | $$ /$$__  $$|__/  | $$              | $$__  $$                             
+# | $$  \ $$ /$$$$$$   /$$$$$$   /$$$$$$$  /$$$$$$  /$$$$$$$   /$$$$$$ | $$| $$  \__/ /$$ /$$$$$$    /$$$$$$ | $$  \ $$ /$$$$$$   /$$$$$$   /$$$$$$ 
+# | $$$$$$$//$$__  $$ /$$__  $$ /$$_____/ /$$__  $$| $$__  $$ |____  $$| $$|  $$$$$$ | $$|_  $$_/   /$$__  $$| $$$$$$$/|____  $$ /$$__  $$ /$$__  $$
+# | $$____/| $$$$$$$$| $$  \__/|  $$$$$$ | $$  \ $$| $$  \ $$  /$$$$$$$| $$ \____  $$| $$  | $$    | $$$$$$$$| $$____/  /$$$$$$$| $$  \ $$| $$$$$$$$
+# | $$     | $$_____/| $$       \____  $$| $$  | $$| $$  | $$ /$$__  $$| $$ /$$  \ $$| $$  | $$ /$$| $$_____/| $$      /$$__  $$| $$  | $$| $$_____/
+# | $$     |  $$$$$$$| $$       /$$$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$| $$|  $$$$$$/| $$  |  $$$$/|  $$$$$$$| $$     |  $$$$$$$|  $$$$$$$|  $$$$$$$
+# |__/      \_______/|__/      |_______/  \______/ |__/  |__/ \_______/|__/ \______/ |__/   \___/   \_______/|__/      \_______/ \____  $$ \_______/
+#                                                                                                                                /$$  \ $$          
+#                                                                                                                               |  $$$$$$/          
+#                                                                                                                                \______/           
+#
+class PersonalSitePage:
+    def __init__(self, template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output",
+                    description: str = '', new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", 
+                    links: list[str] = None, link_titles: list[str] = None, index: int = 0, follow: int = 0, priority: float = 0.6,
+                    write_to_path: bool = False, root: str = "outputs", page_type: str = 'Main', logger=None):
+        self.step = 1
+        self.logging_text = logger
+        index = False if index == 0 else True
+        follow = False if follow == 0 else True
+        self.sitemap_entry = ""
+        self.path_to_page = self.clean_path(path_to_page=path_to_page)
+        current_date = datetime.date.today()
+        self.formatted_current_date = current_date.strftime('%Y-%m-%d')
+        
+        try:
+            with open(template_file_path, "r", encoding="utf-8") as html_file:
+                html_content = html_file.read()
+            self.soup:BeautifulSoup = BeautifulSoup(html_content, "html.parser")
+
+            # Find and modify:
+            # | tag                  | Attribute        | Variable
+            # |----------------------|------------------|-----------------------------------------------------
+            # | title                | Tab Name         | new_title
+            # | header -> a(second)  | Path to Page     | path_to_page
+            # | h1                   | Page Title       | new_header
+            # | nav class="right"    | Page Links       | tuple = (links: list[str], link_titles: list[str])
+            # | zero-md              | Markdown Content | output_file OR md_filename, prioritizes md_filename
+            
+            self.step = self.change_title(new_title=new_title)
+            self.step = self.change_header(new_header=new_header, output_filename=output_filename)
+            self.step = self.change_article(output_filename=output_filename, md_filename=md_filename, page_type=page_type)
+            self.step = self.add_links(links=links, link_titles=link_titles)           
+            self.step = self.clean_links(page_type=page_type)
+            # meta content 
+            self.step = self.set_styles(page_type=page_type)
+            self.step = self.change_meta(index=index, follow=follow, description=description)
+            self.step = self.last_mod_date()
+            # Final step before sitemap - set filepath and write file to path
+            self.step = self.make_html_file(write_to_path=write_to_path, root=root, output_filename=output_filename)
+            self.step = self.make_sitemap_entry(output_filename=output_filename, priority=priority)
+        except FileNotFoundError as fe:
+            self.log(f"File not found.\n{fe}")
+        except Exception as e:
+            self.log(f"An error occurred after step {self.step}: {e}\n")
+            raise
+
+
+
+    #  ███    ███ ███████ ████████ ██   ██  ██████  ██████  ███████ 
+    #  ████  ████ ██         ██    ██   ██ ██    ██ ██   ██ ██      
+    #  ██ ████ ██ █████      ██    ███████ ██    ██ ██   ██ ███████ 
+    #  ██  ██  ██ ██         ██    ██   ██ ██    ██ ██   ██      ██ 
+    #  ██      ██ ███████    ██    ██   ██  ██████  ██████  ███████ 
+    #                                                               
+    
+    def clean_path(self, path_to_page):
+        if path_to_page[0] != '/' and path_to_page[0] != '\\':
+            path_to_page = "/" + path_to_page
+        if len(path_to_page) > 1 and (path_to_page[-1] != '/' and path_to_page[-1] != '\\'):
+            path_to_page = path_to_page + "/"
+        return path_to_page
+    
+    def change_title(self, new_title):
+        if new_title:
+            self.log("    Adding title...", end=" ")
+            try:
+                title_tag = self.soup.find("title")
+                title_tag.string = f"{new_title}"
+                self.log("complete.")
+            except:
+                self.log("no <title> tag found in the template.")
+        else:
+            self.log("    No title to add...", end=" ")
+        return self.step + 1
+    
+    def change_header(self, new_header, output_filename):
+        if new_header:
+            self.log("    Adding header...", end=" ")
+            try:
+                h1_tag = self.soup.find("h1")
+                h1_tag.string = new_header
+                self.log("complete.")
+            except:
+                self.log("no <h1> tag found in the template.")
+            self.step = self.step + 1
+            self.log("    Adding header link...", end=" ")
+            try:
+                header_tag = self.soup.find("header")
+                a_tags = header_tag.find_all("a")
+                if len(a_tags) >= 2:
+                    a_tags[1]["href"] = f"{self.path_to_page}{output_filename}.html" if output_filename != 'index' else '/about.html'
+                self.log("complete.")
+            except:
+                self.log("there is no second <a> tag within the <header> tag.")
+        else:
+            self.log("    No header to add...", end=" ")
+        return self.step + 1
+    
+    def change_article(self, output_filename, md_filename, page_type):
+        self.log("    Adding content...", end=" ")
+        path_to_article = f'/assets/docs{self.path_to_page}'
+        article_details: tuple = ()
+        article_date: str = None
+        if md_filename:
+            article_details = md_filename.split(', ')
+            if len(article_details) > 1:
+                md_filename = article_details[0]
+                article_date = article_details[1]
+        try:
+            zero_md_tag = self.soup.find("zero-md")
+            zero_md_tag["src"] = f"{path_to_article}{md_filename}.md" if md_filename else f"{path_to_article}{output_filename}.md"
+            self.log("complete.", end=" ")
+        except:
+            self.log("no <zero-md> tag found in the template.")
+        if article_date:
+            last_updated = ""
+            if page_type == "Article":
+                last_updated =  f"Written by Mike Verwer; {article_date}"
+            elif page_type == "Main":
+                last_updated = f"Last updated: {article_date}"
+            try:
+                article_date_tag = self.soup.find("p", id="article-date")
+                article_date_tag.string = last_updated
+                self.log("Included date.")
+            except Exception as e:
+                self.log("no date tag found, adding...", end=" ")
+                article_tag = self.soup.find("article")
+                article_date_tag = self.soup.new_tag("p", id="article-date")
+                article_date_tag.string = last_updated
+                article_tag.append(article_date_tag)
+                self.log("date added.")
+        else:
+            self.log("No date to add.")
+        return self.step + 1
+    
+    def add_links(self, links, link_titles):
+        step = 0
+        if links:
+            step += 1
+            self.log("    Adding links...", end=" ")
+            try:
+                step += 1
+                nav_tag = self.soup.find("nav", class_="right")
+                if nav_tag and links is not None:
+                    step += 1
+                    ul_tag = nav_tag.find("ul")
+                    if ul_tag:
+                        # Create and append <li> elements with <a> tags to the <ul> tag
+                        step += 1
+                        for i, href in enumerate(links):
+                            li_tag = self.soup.new_tag("li")
+                            if " target=" in href:
+                                link_portions = href.split()
+                                href_portion = link_portions[0]
+                                target_portion = link_portions[1].split('=')[1]
+                                a_tag = self.soup.new_tag("a", href=href_portion, target=f"{target_portion}")
+                            else:
+                                a_tag = self.soup.new_tag("a", href=href)
+                            a_tag.string = link_titles[i]
+                            li_tag.append(a_tag)
+                            ul_tag.append(li_tag)
+                        step += 1
+                        self.log("complete.")
+                    else:
+                        self.log("no <ul> tag with class='right' found in the template.")
+            except Exception as e:
+                self.log(f"no <nav> tag found in the template. Failed at step {step}.\n      {e}")
+        else:
+            self.log("    No links to add on the page.")
+        return self.step + 1
+    
+    def clean_links(self, page_type):
+        self.log("      Cleaning up links...", end=" ")
+        try:
+            empty_links = self.soup.find_all('li', lambda tag: tag.find('a', href=''))
+            if empty_links:
+                for li_tag in empty_links:
+                    li_tag.extract()
+                self.log("empty links removed.", end=".. ")
+        except:
+            self.log(f"no empty links.", end=".. ")
+        if page_type == "Article":
+            try:
+                all_links = self.soup.find_all('li')
+                for li_tag in all_links:
+                    li_tag.extract()
+                self.log("all page links removed.")
+            except:
+                self.log(f"no links in the template.")
+        else:
+            self.log('nothing else to clean.')
+        return self.step + 1
+    
+    def set_styles(self, page_type):
+        self.log("    Setting page CSS...", end=" ")
+        style_tag = self.soup.find('link')
+        href = ""
+        if page_type == 'Main':
+            href = "/styles/main_page_styles.css"
+        elif page_type == "Article":
+            href = "/styles/article_page_styles.css"
+        style_tag["href"] = href
+        self.log("complete.")
+        return self.step + 1
+    
+    def add_robots_meta_content(self, index, follow):
+        robots_meta_content = ""
+        if index:
+            robots_meta_content += 'index, '
+        else:
+            robots_meta_content += 'noindex, '
+        if follow:
+            robots_meta_content += 'follow'
+        else:
+            robots_meta_content += 'nofollow'
+            
+        if 'noindex' in robots_meta_content and 'nofollow' in robots_meta_content:
+            self.log('this page will NOT be indexed by search engines.')
+        elif 'nofollow' in robots_meta_content:
+            self.log('page WILL be indexed by search engines.')
+        elif 'noindex' in robots_meta_content:
+            self.log('links on this page WILL be indexed by search engines.')
+        else:
+            self.log('page, and links, WILL be indexed by search engines.')
+
+        return robots_meta_content
+    
+    def change_meta(self, index, follow, description):
+        self.log('    Setting SEO...', end=" ")
+        head_tag = self.soup.find('head')
+        robots_meta_tag = None
+        description_meta_tag = None
+
+        try:
+            robots_meta_tag = self.soup.find('meta', attrs={'name': 'robots'})
+            robots_meta_tag['content'] = self.add_robots_meta_content(index, follow)
+        except:
+            self.log("    no `robots` meta tag in the template, adding... ", end=" ")
+            robots_meta_tag = self.soup.new_tag('meta', name='robots')
+            robots_meta_tag['content'] = self.add_robots_meta_content(index, follow)
+            head_tag.append(robots_meta_tag)
+            
+        try:
+            description_meta_tag = self.soup.find('meta', attrs={'name': 'description'})
+            description_meta_tag['content'] = description
+        except:
+            self.log("    no 'description' meta tag in the template, adding... ", end=" ")
+            description_meta_tag = self.soup.new_tag('meta', name='description')
+            description_meta_tag["content"] = description
+            head_tag.append(description_meta_tag)
+
+        return self.step + 1
+    
+    def last_mod_date(self):
+        try:
+            date_tag = self.soup.find('yyyy-mm-dd-hh:mm')
+            date_tag.string = self.formatted_current_date
+        except:
+            pass
+        return self.step + 1
+
+    def make_html_file(self, write_to_path, root, output_filename):
+        if self.path_to_page[0] == '/' or self.path_to_page[0] == '\\':
+            pass
+        else:
+            self.path_to_page = "/" + self.path_to_page
+        if write_to_path:
+            output_file_path = f"{root}{self.path_to_page}{output_filename}.html"
+            output_directory = os.path.dirname(output_file_path)
+            os.makedirs(output_directory, exist_ok=True)
+            with open(output_file_path, 'w', encoding='utf-8') as output_file:
+                output_file.write(str(self.soup.prettify()))
+        else:
+            output_file_path = f"outputs/{output_filename}.html"
+            with open(output_file_path, "w", encoding="utf-8") as output_file:
+                output_file.write(str(self.soup.prettify()))
+        self.log(f"HTML file successfully created and written to {output_file.name}.\n")
+        return self.step + 1
+    
+    def make_sitemap_entry(self, output_filename, priority):
+        page_url = 'https://mikeverwer.github.io'
+        sitemap_entry = f'  <url>\n'
+        sitemap_entry += f'    <loc>{page_url}{self.path_to_page}{output_filename}.html</loc>\n'
+        sitemap_entry += f'    <lastmod>{self.formatted_current_date}</lastmod>\n'
+        sitemap_entry += f'    <changefreq>monthly</changefreq>\n'
+        sitemap_entry += f'    <priority>{priority}</priority>\n'
+        sitemap_entry += f'  </url>\n'
+
+        self.sitemap_entry = sitemap_entry
+        return self.step + 1
+    
+    def log(self, message, end=None, route_print=True):
+        log_widget = self.logging_text
+        log_widget['state'] = 'normal'
+        if route_print:
+            print(message, end=end)
+        if end is None:
+            end = '\n'
+        message += end
+        log_widget.insert('end', message)
+        log_widget.see('end')
+        log_widget['state'] = 'disabled'
 
 
 #   /$$$$$$$$                     /$$ /$$$$$$$$ /$$          
@@ -63,10 +386,15 @@ class ToolTip:
 #                    |__/                                                            
 class InputRow:
     def __init__(self, parent, number: int):
-        self.parent = parent
+        self.parent: ttk.Widget = parent
         self.row_number = number
-        self.frame = Frame(self.parent, padx=10)
+
+        self.frame = ttk.Frame(self.parent)
+        self.frame.grid(row=self.row_number, column=0, pady=1, sticky=(E, W))
+        self.frame.grid_rowconfigure(0, weight=1)
         self.frame.grid_rowconfigure(1, weight=1)
+        self.frame.grid_columnconfigure(0, weight=1)
+
         column_counter = 0
 
         # Row number, page type, and priority ---------------------------------------------------------------
@@ -142,13 +470,16 @@ class InputRow:
         # Right navbar links
         self.links_label = ttk.Label(self.frame, text="Links:", justify=LEFT)
         self.links_entry = ttk.Entry(self.frame, width=100)
-
+        # gridding
         self.link_labels_label.grid(row=0, column=column_counter, padx=5, pady=0, )
         self.links_label.grid(row=1, column=column_counter, padx=5, pady=0)
         column_counter += 1
-        self.link_labels_entry.grid(row=0, column=column_counter, padx=1, pady=0,)
-        self.links_entry.grid(row=1, column=column_counter, padx=1, pady=0)
+
+        self.link_labels_entry.grid(row=0, column=column_counter, padx=1, pady=0, sticky=(E, W))
+        self.links_entry.grid(row=1, column=column_counter, padx=1, pady=0, sticky=(E, W))
         column_counter += 1
+
+        self.frame.grid_columnconfigure(column_counter, weight=1)
 
         # ---------------------------------------------------------------------------------------------------
         self.separator = ttk.Separator(self.frame, orient=HORIZONTAL)
@@ -170,8 +501,8 @@ class InputRow:
                     "link labels -insert": self.link_labels_entry,
                     "links -insert": self.links_entry,
                 }
-
-        self.frame.pack(pady=1)  # re-pack the frame to accommodate for the new row
+        
+        # self.parent.see
 
 
 
@@ -193,13 +524,15 @@ class PageMaker:
         self.root.title("WebPage Generator")
         self.root.iconbitmap('page-maker-icon.ico')
         # Keybinds
-        self.root.bind('<Button 1>', self.remove_focus)
+        # self.root.bind("<Configure>", self.reconfigure_window)
+        # self.root.bind('<Button 1>', self.get_widget_info)
         self.root.bind('<Control-s>', self.save_config)
         self.root.bind("<Control-l>", self.load_config)
         self.root.bind("<F5>", self.autosave)
         self.root.bind("<F8>", self.autoload)
+        self.root.bind("<MouseWheel>", self.on_mouse_wheel)
         # Globals
-        self.autosave_interval = 300_000  # 5 minutes in milliseconds
+        self.autosave_interval = 900_000  # 15 minutes in milliseconds
         self.cwd = os.getcwd()
         self.configs_directory = os.path.join(self.cwd, "configs")
         self.autosave_filepath = os.path.join(self.configs_directory, "autosave.json")
@@ -209,9 +542,13 @@ class PageMaker:
         self.root.update_idletasks()  # wait until the window is finished
         # Window Position
         screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
         window_width = self.root.winfo_width()
-        x_pos = (screen_width - window_width) // 2  # not working, centers the left edge
+        window_height = self.root.winfo_height()
+        x_pos = (screen_width - window_width) // 2
         self.root.geometry(f"+{x_pos}+25")
+        self.root.minsize(window_width, window_height)
+        # self.root.maxsize(screen_width, screen_height - 200)
 
         self.schedule_autosave()
 
@@ -223,22 +560,42 @@ class PageMaker:
     #  ███████ ██   ██    ██     ██████   ██████     ██    
     #                                                                                                           
     def build_window(self):
-        self.topbar_frame = Frame(self.root)
-        self.topbar_frame.pack(pady=10)
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+        
+        self.container = ttk.Frame(self.root, padding=(3, 3, 12, 12))
+        self.container.grid(column=0, row=0, sticky=(N, S, E, W))
+        self.container.rowconfigure(1, weight=1)
+        self.container.columnconfigure(0, weight=1)
+
+        self.topbar_frame = ttk.Frame(self.container)
+        self.topbar_frame.grid(row=0, column=0, pady=10)
         self.create_TopBar()
         
-        self.scrollable_canvas = Canvas(self.root)
-        self.canvas_scrollbar = Scrollbar(self.scrollable_canvas, orient="vertical", command=self.scrollable_canvas.yview)
+        self.scrollable_canvas = Canvas(self.container)
+        self.scrollable_canvas.grid(row=1, column=0, sticky=(N, S, E, W))
 
-        self.scrollable_frame = Frame(self.scrollable_canvas)
+        self.canvas_scrollbar = Scrollbar(self.container, orient="vertical", command=self.scrollable_canvas.yview)
+        self.canvas_scrollbar.grid(row=1, column=2, sticky=(N, S), padx=5)
+
+        self.scrollable_canvas['yscrollcommand'] = self.canvas_scrollbar.set
+        self.scrollable_canvas.config(scrollregion=self.scrollable_canvas.bbox("all"))
+        # self.scrollable_canvas.config(height=min(800, self.scrollable_canvas.winfo_reqheight()))
+        self.scrollable_canvas.columnconfigure(0, weight=1)
+        self.scrollable_canvas.rowconfigure(0, weight=1)
+
+        self.scrollable_frame = ttk.Frame(self.scrollable_canvas, height=100)
+        self.scrollable_frame.grid(row=0, column=0, sticky=(N, E, S, W))
         self.scrollable_frame.bind("<Configure>", lambda e: self.scrollable_canvas.configure(scrollregion=self.scrollable_canvas.bbox("all")))
 
         self.scrollable_canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.scrollable_canvas.configure(yscrollcommand=self.canvas_scrollbar.set)
-        self.scrollable_canvas.bind_all("<MouseWheel>", self.on_mouse_wheel)
 
         self.add_row()  # initial row
         self.add_initial_row_tooltips()
+
+        self.root.update_idletasks()
+        self.scrollable_canvas.config(width=self.scrollable_frame.winfo_width())
 
 
     def create_TopBar(self):
@@ -257,6 +614,18 @@ class PageMaker:
                                      lambda: (self.root_dir_entry.delete(0, END),  # Clear existing text
                                               self.root_dir_entry.insert(END, filedialog.askdirectory())))
         root_dir_button.grid(row=1, column=column_counter, padx=5)
+
+        # Add row/Reset buttons
+        row_buttons_frame = ttk.Frame(self.topbar_frame)
+        row_buttons_frame.grid(row=5, column=column_counter, columnspan=3, sticky=S)
+
+        add_row_button = ttk.Button(row_buttons_frame, text="  Add Row  ", command=self.add_row)
+        add_row_button.grid(row=0, column=0, padx=10, pady=5, sticky=S)
+        import_rows_button = ttk.Button(row_buttons_frame, text='Import', command=self.import_rows)
+        import_rows_button.grid(row=0, column=1, padx=10, pady=5, sticky=S)
+        reset_button = ttk.Button(row_buttons_frame, text="Reset", command=lambda: (self.reset_rows(), self.add_row(), self.add_initial_row_tooltips()))
+        reset_button.grid(row=0, column=2, padx=10, pady=5, sticky=S)
+        # column_counter += 1
         column_counter += 1
 
         self.write_to_path = BooleanVar(value=True)
@@ -284,15 +653,6 @@ class PageMaker:
         make_html_button.grid(row=5, column=column_counter, padx=5, pady=5, sticky=S)
         column_counter += 1
 
-        # Add row/Reset row buttons
-        row_buttons_frame = ttk.Frame(self.topbar_frame)
-        row_buttons_frame.grid(row=5, column=0, columnspan=column_counter, sticky=S)
-
-        add_row_button = ttk.Button(row_buttons_frame, text="  Add Row  ", command=self.add_row)
-        add_row_button.grid(row=0, column=0, padx=10, pady=5, sticky=S)
-        reset_button = ttk.Button(row_buttons_frame, text="Reset", command=lambda: (self.reset_rows(), self.add_row(), self.add_initial_row_tooltips()))
-        reset_button.grid(row=0, column=1, padx=10, pady=5, sticky=S)
-
         # Logging Text
         self.logging_text = Text(self.topbar_frame, width=80, height=8, font='Helvetica 9', background="#dcdcdc", wrap='none')
         self.logging_text.grid(row=0, column=column_counter, rowspan=8, padx=5)
@@ -302,6 +662,7 @@ class PageMaker:
         clear_log_button = ttk.Button(self.topbar_frame, text='X', command=self.clear_log)
         clear_log_button.grid(row=0, column=column_counter)
         clear_log_button.config(width=2)
+        self.topbar_frame.columnconfigure(column_counter, weight=1)
         
 
     def add_initial_row_tooltips(self):
@@ -322,13 +683,27 @@ class PageMaker:
     #  ██  ██  ██ ██ ██  ██ ██ ██    ██ ██   ██     ██      ██    ██ ██  ██ ██ ██           ██ 
     #  ██      ██ ██ ██   ████  ██████  ██   ██     ██       ██████  ██   ████  ██████ ███████ 
     #                                                                                                                                                                                  
-    def add_row(self):
-        new_row = InputRow(self.root, len(self.input_rows) + 1)
+    def add_row(self, parent=None):
+        if parent is None:
+            parent = self.scrollable_frame
+        new_row = InputRow(parent, len(self.input_rows) + 1)
         self.input_rows.append(new_row)
+        self.root.update_idletasks()
+        self.scrollable_canvas.yview(MOVETO, 1)
+        return new_row
 
 
-    def on_mouse_wheel(self, event):  # TODO: may not work as a class method with arguments
-        self.scrollable_canvas.yview_scroll(-1 * int(event.delta/120), "units")   
+    def on_mouse_wheel(self, event):
+        widget: Widget = event.widget
+        if self.scrollable_canvas.winfo_height() - self.scrollable_frame.winfo_height() > 0:
+            return
+        if widget.winfo_class() not in ["Text"]:
+            self.scrollable_canvas.yview_scroll(-1 * int(event.delta/120), "units")   
+
+
+    def get_widget_info(self, event):
+        widget: Widget = event.widget
+        self.log(f"Clicked {widget.winfo_class()}")
 
 
     def remove_focus(self, event=None):
@@ -362,7 +737,6 @@ class PageMaker:
 
 
     def get_template(self, event=None):
-
         self.template_entry.delete(0, END),  # Clear existing text
         self.template_entry.insert(END, filedialog.askopenfilename(defaultextension='.html'))
 
@@ -387,6 +761,12 @@ class PageMaker:
         log_widget.see('end')
         log_widget['state'] = 'disabled'
 
+    
+    def reconfigure_window(self, event=None):
+        self.root.update_idletasks()
+        # window_width = self.root.winfo_width()
+        pass
+
 
     # ███    ███  █████  ██   ██ ███████     ███████ ██ ██      ███████ ███████ 
     # ████  ████ ██   ██ ██  ██  ██          ██      ██ ██      ██      ██      
@@ -397,7 +777,7 @@ class PageMaker:
     def make_files(self):
         root_path = self.root_dir_entry.get()
         if root_path == "":
-            root_path = '/outputs'
+            root_path = os.path.join(self.cwd, 'outputs')
 
         template_file = self.template_entry.get()
         if template_file == "":
@@ -408,14 +788,14 @@ class PageMaker:
         
         self.log("")
         for i, row in enumerate(self.input_rows):
-            self.log("Gathering inputs...")
             row: InputRow
-            page_type = row.page_type.get()
+            self.log("Gathering inputs...")
+            page_type: str = row.page_type.get()
             SEO_priority: str = row.priority_entry.get()
             html_filename: str = row.html_filename_entry.get()
             md_filename: str = row.md_filename_entry.get()
             md_filename: str = None if md_filename == "" else md_filename
-            description = row.description_text.get('1.0', 'end-1c')
+            description: str = row.description_text.get('1.0', 'end-1c').strip()
             names: list = row.names_entry.get().split(", ")
             if html_filename == '':
                 self.log(f"  Input Error.  Missing: HTML Filename in input row {i + 1}. Skipping attempt.")
@@ -449,7 +829,7 @@ class PageMaker:
             SEO_index = row.SEO_index.get()
             SEO_follow = row.SEO_follow.get()
             self.log(f"  Attempting to build {html_filename}.html... ")
-            page = make.PersonalSitePage(template_file_path=template_file, output_filename=html_filename, md_filename=md_filename, description=description,
+            page = PersonalSitePage(template_file_path=template_file, output_filename=html_filename, md_filename=md_filename, description=description,
                                new_title=title, new_header=header, path_to_page=page_path, links=links, link_titles=link_labels, index=SEO_index, 
                                priority=SEO_priority, follow=SEO_follow, write_to_path=self.write_to_path.get(), root=root_path, page_type=page_type,
                                logger=self.logging_text)
@@ -463,7 +843,7 @@ class PageMaker:
         
         self.log('Making robots.txt... ', end="")
         robots_filepath = f"{root_path}/robots.txt"
-        robots_content: str = self.robots_text.get('1.0', 'end-1c')
+        robots_content: str = self.robots_text.get('1.0', 'end-1c').strip()
         try:
             os.makedirs(root_path, exist_ok=True)
             with open(robots_filepath, 'w', encoding='utf-8') as filename:
@@ -484,7 +864,7 @@ class PageMaker:
     # 
     def make_sitemap(self, sitemap_content, root_path):
         # grab the content from any existing sitemap and add pages that aren't already in it.
-        sitemap_filepath = f"{root_path}/sitemap.xml"
+        sitemap_filepath = f"{root_path}\\sitemap.xml"
         step = 0
         loop = 0
         try:
@@ -537,9 +917,9 @@ class PageMaker:
         # write to file
         try:
             os.makedirs(root_path, exist_ok=True)
-            with open(sitemap_filepath, 'w', encoding='utf-8') as output_filename:
-                output_filename.write(str(self.sitemap))
-            self.log("completed successfully.")
+            with open(sitemap_filepath, 'w', encoding='utf-8') as output_sitemap:
+                output_sitemap.write(str(self.sitemap))
+            self.log(f"completed successfully. Sitemap written to {output_sitemap.name}")
         except:
             self.log("error: could not make sitemap.")
             pass
@@ -562,7 +942,7 @@ class PageMaker:
             'project_data': {
                 "root": self.root_dir_entry.get(),
                 "template": self.template_entry.get(),
-                "robots": self.robots_text.get('1.0', 'end-1c')
+                "robots": self.robots_text.get('1.0', 'end-1c').strip()
             }
         }
 
@@ -585,7 +965,7 @@ class PageMaker:
             self.log(f"Config saved successfully to {f.name}.")
 
 
-    def load_config(self, filename=None):
+    def load_config(self, filename=None, clear_rows=True):
         try:
             if filename:
                 loaded_config = filename
@@ -598,38 +978,43 @@ class PageMaker:
             input_data = config_data.get("input_data", [])
             project_data = config_data.get("project_data", {})
 
-            self.reset_rows()
+            if clear_rows:
+                self.reset_rows()
+            current_rows_amount = len(self.input_rows)
             # Create new rows from config data
             for i in range(num_rows):
-                self.log(f"Building row {i + 1}... ")
-                new_row = InputRow(self.root, i + 1)
+                self.log(f"Building row {i + 1 + current_rows_amount}... ")
+                new_row = self.add_row()
 
                 for name, widget in new_row.widgets.items():
                     try:
                         data_entry = input_data[i].get(name, "")
                         if "-text" in name:
+                            widget: Text
+                            data_entry = data_entry.strip()
                             widget.delete('1.0', "end")
                             widget.insert('end-1c', data_entry)
                         elif "-insert" in name:
+                            widget: ttk.Entry
                             widget.insert(0, data_entry)
                         elif "-set" in name:
+                            widget: Checkbutton | ttk.Checkbutton
                             widget.set(data_entry)                    
                     except:
                         name.split('-')
-                        self.log(f"  {name[0]} not found.")
+                        self.log(f"  {name} not found.")
                         pass
-
-                self.input_rows.append(new_row)
 
             self.add_initial_row_tooltips()
 
             # Site-wide settings:
-            self.root_dir_entry.delete(0, END)
-            self.template_entry.delete(0, END)
-            self.robots_text.delete('1.0', END)
-            self.root_dir_entry.insert(0, project_data['root'])
-            self.template_entry.insert(0, project_data['template'])
-            self.robots_text.insert('1.0', project_data['robots'])
+            if clear_rows:
+                self.root_dir_entry.delete(0, END)
+                self.template_entry.delete(0, END)
+                self.robots_text.delete('1.0', END)
+                self.root_dir_entry.insert(0, project_data['root'])
+                self.template_entry.insert(0, project_data['template'])
+                self.robots_text.insert('1.0', project_data['robots'])
 
             self.log("Config loaded successfully.")
             # self.autosave()
@@ -639,10 +1024,8 @@ class PageMaker:
             self.log("Error decoding JSON.")
 
 
-def main():
-    root = Tk()
-    PageMaker(root)
-    root.mainloop()
+    def import_rows(self, event=None):
+        self.load_config(clear_rows=False)
     
 
 if __name__ == "__main__":
