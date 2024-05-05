@@ -28,17 +28,16 @@ def main():
 #
 class PersonalSitePage:
     def __init__(self, template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output",
-                    description: str = '', new_title: str = "page", new_header: str = "Page", path_to_page: str = "/page", 
+                    description: str = '', new_title: str = "page", new_header: str = "Page", path_to_page: str = "/dir", 
                     links: list[str] = None, link_titles: list[str] = None, index: int = 0, follow: int = 0, priority: float = 0.6,
                     write_to_path: bool = False, root: str = "outputs", page_type: str = 'Main', logger=None):
         self.step = 1
-        self.logging_text = logger
-        index = False if index == 0 else True
-        follow = False if follow == 0 else True
+        self.page_url = 'https://mikeverwer.github.io'
         self.sitemap_entry = ""
-        self.path_to_page = self.clean_path(path_to_page=path_to_page)
         current_date = datetime.date.today()
         self.formatted_current_date = current_date.strftime('%Y-%m-%d')
+        self.logging_text = logger
+        self.path_to_page = self.clean_path(path_to_page=path_to_page)
         
         try:
             with open(template_file_path, "r", encoding="utf-8") as html_file:
@@ -306,9 +305,8 @@ class PersonalSitePage:
         return self.step + 1
     
     def make_sitemap_entry(self, output_filename, priority):
-        page_url = 'https://mikeverwer.github.io'
         sitemap_entry = f'  <url>\n'
-        sitemap_entry += f'    <loc>{page_url}{self.path_to_page}{output_filename}.html</loc>\n'
+        sitemap_entry += f'    <loc>{self.page_url}{self.path_to_page}{output_filename}.html</loc>\n'
         sitemap_entry += f'    <lastmod>{self.formatted_current_date}</lastmod>\n'
         sitemap_entry += f'    <changefreq>monthly</changefreq>\n'
         sitemap_entry += f'    <priority>{priority}</priority>\n'
@@ -525,7 +523,7 @@ class PageMaker:
         self.root.iconbitmap('page-maker-icon.ico')
         # Keybinds
         # self.root.bind("<Configure>", self.reconfigure_window)
-        # self.root.bind('<Button 1>', self.get_widget_info)
+        self.root.bind('<Control-Button 1>', self.get_widget_info)
         self.root.bind('<Control-s>', self.save_config)
         self.root.bind("<Control-l>", self.load_config)
         self.root.bind("<F5>", self.autosave)
@@ -580,11 +578,10 @@ class PageMaker:
 
         self.scrollable_canvas['yscrollcommand'] = self.canvas_scrollbar.set
         self.scrollable_canvas.config(scrollregion=self.scrollable_canvas.bbox("all"))
-        # self.scrollable_canvas.config(height=min(800, self.scrollable_canvas.winfo_reqheight()))
         self.scrollable_canvas.columnconfigure(0, weight=1)
         self.scrollable_canvas.rowconfigure(0, weight=1)
 
-        self.scrollable_frame = ttk.Frame(self.scrollable_canvas, height=100)
+        self.scrollable_frame = ttk.Frame(self.scrollable_canvas)
         self.scrollable_frame.grid(row=0, column=0, sticky=(N, E, S, W))
         self.scrollable_frame.bind("<Configure>", lambda e: self.scrollable_canvas.configure(scrollregion=self.scrollable_canvas.bbox("all")))
 
@@ -596,6 +593,7 @@ class PageMaker:
 
         self.root.update_idletasks()
         self.scrollable_canvas.config(width=self.scrollable_frame.winfo_width())
+        self.scrollable_canvas.config(height=self.scrollable_frame.winfo_height() * 8)
 
 
     def create_TopBar(self):
@@ -703,7 +701,9 @@ class PageMaker:
 
     def get_widget_info(self, event):
         widget: Widget = event.widget
-        self.log(f"Clicked {widget.winfo_class()}")
+        x, y = widget.winfo_width(), widget.winfo_height()
+        self.log(f"Clicked {widget.winfo_class()} - Hierarchy: {widget}")
+        self.log(f"  size = ({x}, {y})")
 
 
     def remove_focus(self, event=None):
