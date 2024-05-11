@@ -6,6 +6,8 @@ import re
 import json
 from bs4 import BeautifulSoup
 import datetime
+import ctypes
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("PageMaker.MikeVerwer")
 
 
 def main():
