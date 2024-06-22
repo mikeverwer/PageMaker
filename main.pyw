@@ -27,7 +27,6 @@ def main():
 #                                                                                                                                /$$  \ $$          
 #                                                                                                                               |  $$$$$$/          
 #                                                                                                                                \______/           
-#
 class PersonalSitePage:
     def __init__(self, template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output",
                     description: str = '', new_title: str = "page", new_header: str = "Page", path_to_page: str = "/dir", 
@@ -318,7 +317,7 @@ class PersonalSitePage:
         return self.step + 1
     
     def log(self, message, end=None, route_print=True):
-        log_widget = self.logging_text
+        log_widget: Text = self.logging_text
         log_widget['state'] = 'normal'
         if route_print:
             print(message, end=end)
