@@ -1,0 +1,348 @@
+/* Body & HTML styles */
+
+@font-face{
+    src: url(/assets/fonts/Rubik-VariableFont_wght.ttf);
+    font-family: "Rubik", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+body {
+    display: flex;
+    flex-flow: column nowrap;
+    min-height: 100vh;
+    background-color: #dcdcdc;
+    background-image: url("/assets/images/background.png");
+    background-attachment: scroll;
+    background-repeat: repeat;
+    font-family: 'Rubik', Helvetica, Arial, sans-serif;
+}
+
+.container {
+    padding: 0 90px;
+}
+
+/* Keyboard button style */
+kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font-size: 11px;
+  line-height: 10px;
+  color: #555;
+  vertical-align: middle;
+  background-color: #fcfcfc;
+  border: solid 1px #ccc;
+  border-bottom-color: #bbb;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #bbb;
+}
+
+/* Fixed-Position Button styles */
+
+button#toggle-sidebars{
+    position: fixed;
+    top: 96px;
+    right: 14px;
+    padding: 8px 10px 12px 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.75rem;
+    justify-content: center;
+    width: 62px;
+    font-family: "Cambria", "serif" ;
+}
+
+button#toggle-sidebars:hover {
+    background-color: #ffffff55;
+}
+
+.panel-toggle-area {
+    position: fixed;
+    top: 160px;
+    bottom: 55px;
+    width: 64px;
+    cursor: pointer;
+    z-index: 1;  /* Ensure the toggle area is above other elements */
+}
+
+.panel-toggle-area:hover {
+    background-color: #ffffff55;
+}
+
+.panel-toggle-area#right-side {
+    right: 0;
+}
+
+.panel-toggle-area#left-side {
+    left: 0;
+}
+
+/* Header styles */
+
+header {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Bold', Arial, sans-serif;
+    padding: 0 90px;
+}
+
+header a {
+    color: black;
+    text-decoration: none;
+}
+
+header a:hover {
+    cursor: cell;
+    color: white;
+}
+
+header h1{
+    font-size: 64px;
+}
+
+header #home-button {
+    margin: 8px;
+    height: 96px;
+    padding: 4px;
+    border: 4px solid transparent;
+    background-color: transparent;
+}
+
+header #home-button:hover {
+    cursor: none;
+    border: 4px solid white;
+    background-color: white;
+}
+
+/* Main Section styles */
+
+.main-section {
+    display: flex;
+    flex-flow: row nowrap;
+    padding: 10px;
+    justify-content: space-between;
+}
+
+article {
+    flex: 1 1 1200px;
+    background-color: #eaeaea;
+    padding: 40px 40px;
+    /* max-width: 1200px; */
+    overflow: scroll;
+}
+
+article a {
+    color: #0047ab;
+}
+
+#article-date{
+  font-size: 0.8em;
+  margin-top: 64px;
+  margin-bottom: 0;
+  float: right;
+  text-decoration: overline;
+  color: #0047ab69;
+}
+
+/* Nav Styles */
+
+nav ul {
+    list-style: none;
+}
+
+nav.horizontal-nav#main-links {
+    box-shadow: 0px 3px 4px -4px #333333aa;
+}
+
+nav.horizontal-nav ul {
+    display: flex;
+    flex-flow: row wrap;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+nav.horizontal-nav#main-links li {
+    text-align: center;
+    font-size: 1em;
+}
+
+nav.horizontal-nav#side-links ul {
+    padding-top: 5px;
+}
+
+nav.horizontal-nav#side-links li {
+    text-align: center;
+    text-decoration: underline #0047ab;
+    font-size: 0.9em;
+    /* width: 100%; */
+}
+
+nav.horizontal-nav a {
+    padding: 2px 4px;
+    display: block;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    width: 100%;
+}
+
+nav.horizontal-nav a:active {
+    background-color: #eaeaea;
+}
+
+nav.vertical-nav {
+    padding-top: 32px;
+    flex: 0 0 150px;
+    font-size: 1.5em;
+    color: #1b1b1b;
+    font-weight: bold;
+}
+
+nav#rightNav {
+    text-align: right;
+    font-size: 1.25em;
+    justify-content: right;
+}
+
+nav.vertical-nav li {
+    padding: 5px 0;
+}
+
+nav.vertical-nav a {
+    padding: 10px 0;
+    text-decoration: none;
+    color: black;
+}
+
+nav.vertical-nav a:hover {
+    color: white;
+    cursor: cell;
+}
+
+/* Footer styles */
+
+.vspace {
+    min-height: auto;
+    flex-grow: 1;
+}
+
+footer {
+    padding: 0 16px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    font-family: monospace;
+    color: #1b1b1b;
+}
+
+.author {
+    background-color:#dcdcdc;
+}
+
+.secret-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+}
+
+.last-modified {
+    display: flex;
+    align-items: center;
+}
+
+.last-modified span.date-modified {
+    text-decoration: underline;
+}
+
+img.bottom-right-image {
+    box-sizing: content-box;
+    height: 20px;
+    margin: 4px;
+    margin-left: 10px;
+    padding: 4px 6px;
+}
+
+img.bottom-right-image:hover {
+    cursor: none;
+    background-color: white;
+}
+
+/* Mobile Styles */
+
+@media only screen and (max-width: 810px) {
+    
+    body {
+        background-size: 1000px 5000px;
+    }
+
+    header {
+        margin: 0;
+        padding: 0;
+    }
+
+    header #home-button {
+        height: 60px;
+        background-color: white;
+    }
+    
+    header h1 {
+        font-size: 2.5em;
+        padding-right: 10px;
+    }
+
+    nav.horizontal-nav {
+        display: block;
+    }
+
+    nav.vertical-nav {
+        display: none;
+    }
+
+    #toggle-sidebars {
+        display: none;
+    }
+
+    .panel-toggle-area {
+        display: none;
+    }
+
+    .container {
+        padding: 0 30px;
+    }
+
+    article {
+        padding: 10px;
+    }
+
+    article h1 {
+        font-size: 2em;
+    }
+
+
+
+
+}
+
+@media only screen and (min-width: 811px) {
+    nav.horizontal-nav {
+        display: none;
+    }
+
+    nav.vertical-nav {
+        display: block;
+    }
+
+}
+
+
+/* Debugging */ 
+
+/* * {
+    border: thin dotted red;
+} */

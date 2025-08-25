@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="noindex, nofollow" name="robots"/>
+  <meta content="Page Template: ArticlePage" name="description"/>
+  <link href="/assets/images/favicon.png" rel="icon" type="image/png"/>
+  <!-- Styles -->
+  <link href="/styles/reset.css" rel="stylesheet"/>
+  <link href="/styles/main-styles.css" rel="stylesheet"/>
+  <link href="/styles/markdown-styles.css" rel="stylesheet"/>
+  <link href="/styles/syntax-highlighting-material.css" rel="stylesheet"/>
+  <title>
+   Article
+  </title>
+  <!-- MathJax -->
+  <script>
+   window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <!-- Mermaid import-->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js">
+  </script>
+  <!-- Local scripts -->
+  <script src="/js/scripts.js">
+  </script>
+  <script src="/js/marked-footnote.js">
+  </script>
+  <script src="/js/render-markdown.js" type="module">
+  </script>
+ </head>
+ <body>
+  <!-- "zen-mode" button (hides/shows both nav bars) -->
+  <button id="toggle-sidebars">
+   { }
+  </button>
+  <header>
+   <a href="https://mikeverwer.github.io/index.html">
+    <img alt="Home" id="home-button" src="/assets/images/website-icon-1.png"/>
+   </a>
+   <a href="/about.html">
+    <h1>
+     Mike Verwer
+    </h1>
+   </a>
+  </header>
+  <nav class="horizontal-nav" id="main-links">
+   <ul>
+   </ul>
+  </nav>
+  <nav class="horizontal-nav" id="side-links">
+   <ul>
+   </ul>
+  </nav>
+  <div class="container">
+   <div class="main-section">
+    <!-- Toggle Area -->
+    <div class="panel-toggle-area" id="left-side">
+    </div>
+    <nav class="vertical-nav" id="leftNav">
+     <ul>
+     </ul>
+    </nav>
+    <article>
+     <div class="markdown-body" id="markdown-content" src="/assets/docs/articles/content.md">
+     </div>
+    </article>
+    <nav class="vertical-nav" id="rightNav">
+     <ul>
+     </ul>
+    </nav>
+    <!-- Navbar Toggle Area -->
+    <div class="panel-toggle-area" id="right-side">
+    </div>
+   </div>
+  </div>
+  <div class="vspace">
+  </div>
+  <footer>
+   <div class="author">
+    Made by Mike Verwer
+   </div>
+   <div class="secret-container">
+    <div class="last-modified">
+     Last Modified:
+     <span class="date-modified">
+      2025-08-24
+     </span>
+    </div>
+    <a href="/secret.html">
+     <img alt="Golden rectangle" class="bottom-right-image" src="/assets/images/golden-rectangle.png"/>
+    </a>
+   </div>
+  </footer>
+ </body>
+</html>

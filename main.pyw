@@ -4,7 +4,7 @@ from tkinter import filedialog
 import os
 import re
 import json
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag, Comment
 import datetime
 import ctypes
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("PageMaker.MikeVerwer")
@@ -46,13 +46,13 @@ class PersonalSitePage:
             self.soup:BeautifulSoup = BeautifulSoup(html_content, "html.parser")
 
             # Find and modify:
-            # | tag                  | Attribute        | Variable
-            # |----------------------|------------------|-----------------------------------------------------
-            # | title                | Tab Name         | new_title
-            # | header -> a(second)  | Path to Page     | path_to_page
-            # | h1                   | Page Title       | new_header
-            # | nav class="right"    | Page Links       | tuple = (links: list[str], link_titles: list[str])
-            # | zero-md              | Markdown Content | output_file OR md_filename, prioritizes md_filename
+            # | tag                      | Attribute        | Variable
+            # |--------------------------|------------------|-----------------------------------------------------
+            # | title                    | Tab Name         | new_title
+            # | header -> a(second)      | Path to Page     | path_to_page
+            # | h1                       | Page Title       | new_header
+            # | nav class="right"        | Page Links       | tuple = (links: list[str], link_titles: list[str])
+            # | class="markdown-content" | Markdown Content | output_file OR md_filename, prioritizes md_filename
             
             self.step = self.change_title(new_title=new_title)
             self.step = self.change_header(new_header=new_header, output_filename=output_filename)
@@ -60,7 +60,7 @@ class PersonalSitePage:
             self.step = self.add_links(links=links, link_titles=link_titles)           
             self.step = self.clean_links(page_type=page_type)
             # meta content 
-            self.step = self.set_styles(page_type=page_type)
+            # self.step = self.set_styles(page_type=page_type)      Deprecated - all pages now use the same css
             self.step = self.change_meta(index=index, follow=follow, description=description)
             self.step = self.last_mod_date()
             # Final step before sitemap - set filepath and write file to path
@@ -88,6 +88,7 @@ class PersonalSitePage:
             path_to_page = path_to_page + "/"
         return path_to_page
     
+    
     def change_title(self, new_title):
         if new_title:
             self.log("    Adding title...", end=" ")
@@ -100,6 +101,7 @@ class PersonalSitePage:
         else:
             self.log("    No title to add...", end=" ")
         return self.step + 1
+    
     
     def change_header(self, new_header, output_filename):
         if new_header:
@@ -116,13 +118,14 @@ class PersonalSitePage:
                 header_tag = self.soup.find("header")
                 a_tags = header_tag.find_all("a")
                 if len(a_tags) >= 2:
-                    a_tags[1]["href"] = f"{self.path_to_page}{output_filename}.html" if output_filename != 'index' else '/about.html'
+                    a_tags[1]["href"] = f"#" if output_filename != 'index' else '/about.html'
                 self.log("complete.")
             except:
                 self.log("there is no second <a> tag within the <header> tag.")
         else:
             self.log("    No header to add...", end=" ")
         return self.step + 1
+    
     
     def change_article(self, output_filename, md_filename, page_type):
         self.log("    Adding content...", end=" ")
@@ -135,11 +138,11 @@ class PersonalSitePage:
                 md_filename = article_details[0]
                 article_date = article_details[1]
         try:
-            zero_md_tag = self.soup.find("zero-md")
-            zero_md_tag["src"] = f"{path_to_article}{md_filename}.md" if md_filename else f"{path_to_article}{output_filename}.md"
+            markdown_content = self.soup.find("div", class_="markdown-body")
+            markdown_content["src"] = f"{path_to_article}{md_filename}.md" if md_filename else f"{path_to_article}{output_filename}.md"
             self.log("complete.", end=" ")
         except:
-            self.log("no <zero-md> tag found in the template.")
+            self.log('no <div class="markdown-content"> tag found in the template.')
         if article_date:
             last_updated = ""
             if page_type == "Article":
@@ -161,6 +164,7 @@ class PersonalSitePage:
             self.log("No date to add.")
         return self.step + 1
     
+    
     def add_links(self, links, link_titles):
         step = 0
         if links:
@@ -168,34 +172,38 @@ class PersonalSitePage:
             self.log("    Adding links...", end=" ")
             try:
                 step += 1
-                nav_tag = self.soup.find("nav", class_="right")
-                if nav_tag and links is not None:
-                    step += 1
-                    ul_tag = nav_tag.find("ul")
-                    if ul_tag:
-                        # Create and append <li> elements with <a> tags to the <ul> tag
+                nav_tags = []
+                nav_tags.append(self.soup.find("nav", id="rightNav"))
+                nav_tags.append(self.soup.find("nav", id="side-links"))
+                for nav_tag in nav_tags:
+                    if nav_tag and links is not None:
                         step += 1
-                        for i, href in enumerate(links):
-                            li_tag = self.soup.new_tag("li")
-                            if " target=" in href:
-                                link_portions = href.split()
-                                href_portion = link_portions[0]
-                                target_portion = link_portions[1].split('=')[1]
-                                a_tag = self.soup.new_tag("a", href=href_portion, target=f"{target_portion}")
-                            else:
-                                a_tag = self.soup.new_tag("a", href=href)
-                            a_tag.string = link_titles[i]
-                            li_tag.append(a_tag)
-                            ul_tag.append(li_tag)
-                        step += 1
-                        self.log("complete.")
-                    else:
-                        self.log("no <ul> tag with class='right' found in the template.")
+                        ul_tag = nav_tag.find("ul")
+                        if ul_tag:
+                            # Create and append <li> elements with <a> tags to the <ul> tag
+                            step += 1
+                            for i, href in enumerate(links):
+                                li_tag = self.soup.new_tag("li")
+                                if " target=" in href:
+                                    link_portions = href.split()
+                                    href_portion = link_portions[0]
+                                    target_portion = link_portions[1].split('=')[1]
+                                    a_tag = self.soup.new_tag("a", href=href_portion, target=f"{target_portion}")
+                                else:
+                                    a_tag = self.soup.new_tag("a", href=href)
+                                a_tag.string = link_titles[i]
+                                li_tag.append(a_tag)
+                                ul_tag.append(li_tag)
+                            step += 1
+                            self.log("complete.")
+                        else:
+                            self.log("<nav> tag not found in the template.")
             except Exception as e:
                 self.log(f"no <nav> tag found in the template. Failed at step {step}.\n      {e}")
         else:
             self.log("    No links to add on the page.")
         return self.step + 1
+    
     
     def clean_links(self, page_type):
         self.log("      Cleaning up links...", end=" ")
@@ -207,6 +215,7 @@ class PersonalSitePage:
                 self.log("empty links removed.", end=".. ")
         except:
             self.log(f"no empty links.", end=".. ")
+            
         if page_type == "Article":
             try:
                 all_links = self.soup.find_all('li')
@@ -219,6 +228,7 @@ class PersonalSitePage:
             self.log('nothing else to clean.')
         return self.step + 1
     
+    
     def set_styles(self, page_type):
         self.log("    Setting page CSS...", end=" ")
         style_tag = self.soup.find('link')
@@ -230,6 +240,7 @@ class PersonalSitePage:
         style_tag["href"] = href
         self.log("complete.")
         return self.step + 1
+    
     
     def add_robots_meta_content(self, index, follow):
         robots_meta_content = ""
@@ -250,8 +261,8 @@ class PersonalSitePage:
             self.log('links on this page WILL be indexed by search engines.')
         else:
             self.log('page, and links, WILL be indexed by search engines.')
-
         return robots_meta_content
+    
     
     def change_meta(self, index, follow, description):
         self.log('    Setting SEO...', end=" ")
@@ -276,16 +287,17 @@ class PersonalSitePage:
             description_meta_tag = self.soup.new_tag('meta', name='description')
             description_meta_tag["content"] = description
             head_tag.append(description_meta_tag)
-
         return self.step + 1
+    
     
     def last_mod_date(self):
         try:
-            date_tag = self.soup.find('yyyy-mm-dd-hh:mm')
+            date_tag = self.soup.find("span", class_="date-modified")
             date_tag.string = self.formatted_current_date
         except:
             pass
         return self.step + 1
+    
 
     def make_html_file(self, write_to_path, root, output_filename):
         if self.path_to_page[0] == '/' or self.path_to_page[0] == '\\':
@@ -305,6 +317,7 @@ class PersonalSitePage:
         self.log(f"HTML file successfully created and written to {output_file.name}.\n")
         return self.step + 1
     
+    
     def make_sitemap_entry(self, output_filename, priority):
         sitemap_entry = f'  <url>\n'
         sitemap_entry += f'    <loc>{self.page_url}{self.path_to_page}{output_filename}.html</loc>\n'
@@ -312,9 +325,9 @@ class PersonalSitePage:
         sitemap_entry += f'    <changefreq>monthly</changefreq>\n'
         sitemap_entry += f'    <priority>{priority}</priority>\n'
         sitemap_entry += f'  </url>\n'
-
         self.sitemap_entry = sitemap_entry
         return self.step + 1
+    
     
     def log(self, message, end=None, route_print=True):
         log_widget: Text = self.logging_text
@@ -327,7 +340,9 @@ class PersonalSitePage:
         log_widget.insert('end', message)
         log_widget.see('end')
         log_widget['state'] = 'disabled'
+        
 
+    
 
 #   /$$$$$$$$                     /$$ /$$$$$$$$ /$$          
 #  |__  $$__/                    | $$|__  $$__/|__/          
@@ -536,6 +551,7 @@ class PageMaker:
         self.configs_directory = os.path.join(self.cwd, "configs")
         self.autosave_filepath = os.path.join(self.configs_directory, "autosave.json")
         self.input_rows = []
+        self.root.state('zoomed')
         # Window Creation
         self.build_window()
         self.root.update_idletasks()  # wait until the window is finished
