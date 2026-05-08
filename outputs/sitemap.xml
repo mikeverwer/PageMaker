@@ -2,55 +2,55 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mikeverwer.github.io/page.html</loc>
-    <lastmod>2025-08-24</lastmod>
+    <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.0</priority>
   </url>
   <url>
     <loc>https://mikeverwer.github.io/index.html</loc>
-    <lastmod>2025-08-24</lastmod>
+    <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mikeverwer.github.io/youtube.html</loc>
-    <lastmod>2025-08-24</lastmod>
+    <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mikeverwer.github.io/teaching.html</loc>
-    <lastmod>2025-08-24</lastmod>
+    <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mikeverwer.github.io/programs.html</loc>
-    <lastmod>2025-08-24</lastmod>
+    <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://mikeverwer.github.io/about.html</loc>
-    <lastmod>2025-08-24</lastmod>
+    <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://mikeverwer.github.io/programs/roll_dice.html</loc>
-    <lastmod>2025-08-24</lastmod>
+    <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.4</priority>
   </url>
   <url>
     <loc>https://mikeverwer.github.io/programs/playing_with_primes.html</loc>
-    <lastmod>2025-08-24</lastmod>
+    <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.4</priority>
   </url>
   <url>
     <loc>https://mikeverwer.github.io/404.html</loc>
-    <lastmod>2025-08-24</lastmod>
+    <lastmod>2026-05-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.0</priority>
   </url>
@@ -84,6 +84,35 @@
     <changefreq>monthly</changefreq>
     <priority>0.1</priority>
   </url>
+
+
+
+
+
+
+
+
+  <url>
+    <loc>https://mikeverwer.github.io/apps/coin_flip.html</loc>
+    <lastmod>2026-05-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>None</priority>
+  </url>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

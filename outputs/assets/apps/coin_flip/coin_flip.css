@@ -1,0 +1,128 @@
+/* ── Coin Flip App ───────────────────────────────────────────────── */
+
+#coin-flip-app {
+    flex: 1 1 1200px;
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 24px;
+    padding: 24px 16px;
+    min-width: 0; /* prevent flex blowout */
+    max-width: 1200px;
+}
+
+/* ── Form ────────────────────────────────────────────────────────── */
+
+#flip-form {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 12px 24px;
+    background-color: #eaeaea;
+    padding: 20px 24px;
+}
+
+#flip-form label {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #1b1b1b;
+    white-space: nowrap;
+}
+
+#flip-form input[type="number"] {
+    width: 80px;
+    padding: 6px 8px;
+    font-family: 'Rubik', Helvetica, Arial, sans-serif;
+    font-size: 0.9em;
+    border: 1px solid #bbb;
+    background-color: #f8f8f8;
+    color: #1b1b1b;
+    outline: none;
+}
+
+#flip-form input[type="number"]:focus {
+    border-color: #0047ab;
+}
+
+/* Group each label+input pair */
+.form-group {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 8px;
+}
+
+#flip-form input[type="range"] {
+    width: 160px;
+    accent-color: #0047ab;
+    cursor: pointer;
+}
+
+#prob-display {
+    font-weight: normal;
+    color: #0047ab;
+    font-variant-numeric: tabular-nums;
+}
+
+#run-btn {
+    margin-left: auto;
+    padding: 8px 24px;
+    background-color: #1b1b1b;
+    color: #dcdcdc;
+    border: none;
+    font-family: 'Rubik', Helvetica, Arial, sans-serif;
+    font-size: 0.9em;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+#run-btn:hover {
+    background-color: #0047ab;
+    color: white;
+}
+
+/* ── Plots ───────────────────────────────────────────────────────── */
+
+#plots {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 16px;
+    min-width: 0;
+}
+
+#theoretical-plot,
+#flip-plot {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 400px;
+}
+
+/* ── Article ─────────────────────────────────────────────────────── */
+
+#coin-flip-app article {
+  flex: 0 1 auto;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────── */
+
+@media only screen and (max-width: 810px) {
+
+    #coin-flip-app {
+        padding: 12px 0;
+    }
+
+    #flip-form {
+        gap: 10px 16px;
+        padding: 14px 16px;
+    }
+
+    #run-btn {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    #plots {
+        flex-flow: column nowrap;
+    }
+}

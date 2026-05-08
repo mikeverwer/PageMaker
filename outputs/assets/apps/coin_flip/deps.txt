@@ -1,0 +1,4 @@
+https://cdn.plot.ly/plotly-3.5.0.min.js
+https://cdn.fakesourece1.js
+https://cdn.fakesourece2.js
+https://cdn.fakesourece3.js

@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup, Tag, Comment
 import datetime
 import ctypes
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("PageMaker.MikeVerwer")
-
+import html_reformat
 
 def main():
     root = Tk()
@@ -57,6 +57,7 @@ class PersonalSitePage:
             self.step = self.change_title(new_title=new_title)
             self.step = self.change_header(new_header=new_header, output_filename=output_filename)
             self.step = self.change_article(output_filename=output_filename, md_filename=md_filename, page_type=page_type)
+            self.step = self.add_app(page_type=page_type, root=root, output_filename=output_filename)
             self.step = self.add_links(links=links, link_titles=link_titles)           
             self.step = self.clean_links(page_type=page_type)
             # meta content 
@@ -165,6 +166,133 @@ class PersonalSitePage:
         return self.step + 1
     
     
+    def add_app(self, page_type, root, output_filename):
+        if page_type != "App":
+            return self.step + 1
+        # files are located in root/assets/apps/output_filename
+        # inject content.html into main-section div (insert at top)
+        # add <link rel="stylesheet" href="root/assets/apps/{output_filename}/app.css">
+        # check /../apps/name/deps.txt for required libraries
+        # add <script src=""
+        self.log("    Adding the app...", end=" ")
+        asset_path = f'{root}/assets/apps/{output_filename}'
+        head_tag = self.soup.find("head")
+        scripts = head_tag.find_all("script")
+
+        if not os.path.isdir(asset_path):
+            self.log(f"No app assets directory found at {asset_path}, skipping.")
+            return self.step + 1
+        
+        try:
+            main_section_tag = self.soup.find_all('div', class_="main-section")[0]
+        except:
+            self.log("No 'main-section' div found. Can not continue, skipping.")
+            return self.step + 1
+        
+        # Inject app html
+        try:
+            with open(f'{asset_path}/content.html', "r", encoding="utf-8") as html_file:
+                app_html = html_file.read()
+            app_soup = BeautifulSoup(app_html, "html.parser")
+            app_container_div = self.soup.new_tag("div", id="app-container")
+            app_container_div.append(app_soup)
+            main_section_tag.insert(0, app_container_div)
+            self.log("App HTML injected...", end=' ')
+        except FileNotFoundError:
+            self.log("No app HTML found, skipping.")
+            return self.step + 1
+        
+        # Add requirement imports
+        self.log("Adding scripts...", end=' ')
+        deps = []
+        try:
+            with open(f"{asset_path}/deps.txt", "r") as deps_file:
+                for dep in deps_file:
+                    link = dep.strip()
+                    deps.insert(0, self.soup.new_tag("script", src=link))
+        except FileNotFoundError:
+            self.log(f"No dependencies found...", end=' ')
+
+        deps.insert(0, self.soup.new_tag(
+            "script", src=f"/assets/apps/{output_filename}.js"))
+        
+        try:
+            last_script = scripts[-1]
+            for dep in deps:
+                last_script.insert_after(dep)
+        except IndexError:  # no scripts in the head tag
+            deps.reverse()
+            for dep in deps:
+                head_tag.append(dep)
+
+        # Add style sheet
+        app_style_tag = self.soup.new_tag(
+                "link", 
+                rel="stylesheet", 
+                src='/assets/apps/{output_filename}.css')
+        try:
+            styles = head_tag.find_all("link", rel="stylesheet")
+            last_style = styles[-1]
+            last_style.insert_after(app_style_tag)
+        except Exception:
+            title_tag = head_tag.find("title")
+            title_tag.insert_before(app_style_tag)
+
+        self.log('Styles added... Complete.')
+        return self.step + 1
+
+
+    def add_links(self, links, link_titles):
+        if not links:
+            self.log("    No links to add on the page.")
+            return self.step + 1
+
+        if len(links) != len(link_titles):
+            self.log(f"    Mismatched links/titles ({len(links)} vs {len(link_titles)}); skipping.")
+            return self.step + 1
+
+        self.log("    Adding links...", end=" ")
+        nav_ids = ("rightNav", "side-links")
+        navs_with_uls = [
+            (nav, nav.find("ul"))
+            for nav_id in nav_ids
+            if (nav := self.soup.find("nav", id=nav_id)) is not None
+        ]
+
+        if not navs_with_uls:
+            self.log("no suitable <nav> found.")
+            return self.step + 1
+
+        for nav_tag, ul_tag in navs_with_uls:
+            if ul_tag is None:
+                ul_tag = self.soup.new_tag("ul")
+                nav_tag.append(ul_tag)
+            else:   # remove any links from the template page
+                for li_tag in ul_tag.find_all("li"):
+                    li_tag.extract()
+
+            for href, title in zip(links, link_titles):
+                ul_tag.append(self._build_link_li(href, title))
+
+        self.log("complete.")
+        return self.step + 1
+    
+
+    def _build_link_li(self, href, title):
+        """Build <li><a href="..." [target="..."]>title</a></li>."""
+        a_attrs = {"href": href}
+        parts = href.split(maxsplit=1)
+        if len(parts) == 2 and parts[1].startswith("target="):
+            a_attrs["href"] = parts[0]
+            a_attrs["target"] = parts[1].split("=", 1)[1]
+        a_tag = self.soup.new_tag("a", **a_attrs)
+        a_tag.string = title
+        li_tag = self.soup.new_tag("li")
+        li_tag.append(a_tag)
+        return li_tag
+
+
+    """
     def add_links(self, links, link_titles):
         step = 0
         if links:
@@ -195,15 +323,15 @@ class PersonalSitePage:
                                 li_tag.append(a_tag)
                                 ul_tag.append(li_tag)
                             step += 1
-                            self.log("complete.")
                         else:
                             self.log("<nav> tag not found in the template.")
+                self.log("complete.")
             except Exception as e:
                 self.log(f"no <nav> tag found in the template. Failed at step {step}.\n      {e}")
         else:
             self.log("    No links to add on the page.")
         return self.step + 1
-    
+    """
     
     def clean_links(self, page_type):
         self.log("      Cleaning up links...", end=" ")
@@ -300,6 +428,7 @@ class PersonalSitePage:
     
 
     def make_html_file(self, write_to_path, root, output_filename):
+        self.log("    Building HTML...", end=' ')
         if self.path_to_page[0] == '/' or self.path_to_page[0] == '\\':
             pass
         else:
@@ -309,17 +438,18 @@ class PersonalSitePage:
             output_directory = os.path.dirname(output_file_path)
             os.makedirs(output_directory, exist_ok=True)
             with open(output_file_path, 'w', encoding='utf-8') as output_file:
-                output_file.write(str(self.soup.prettify()))
+                output_file.write(str(html_reformat.reformat(self.soup.prettify())))
         else:
             output_file_path = f"outputs/{output_filename}.html"
             with open(output_file_path, "w", encoding="utf-8") as output_file:
-                output_file.write(str(self.soup.prettify()))
+                output_file.write(str(html_reformat.reformat(self.soup.prettify())))
+        self.log("Complete.")
         self.log(f"HTML file successfully created and written to {output_file.name}.\n")
         return self.step + 1
     
     
     def make_sitemap_entry(self, output_filename, priority):
-        sitemap_entry = f'  <url>\n'
+        sitemap_entry  = f'  <url>\n'
         sitemap_entry += f'    <loc>{self.page_url}{self.path_to_page}{output_filename}.html</loc>\n'
         sitemap_entry += f'    <lastmod>{self.formatted_current_date}</lastmod>\n'
         sitemap_entry += f'    <changefreq>monthly</changefreq>\n'
@@ -418,7 +548,7 @@ class InputRow:
         self.page_type = StringVar(value='Main')
         self.page_type_label = ttk.Label(self.type_frame, text="Page Type:")
         self.page_type_combo = ttk.Combobox(self.type_frame, textvariable=self.page_type, width=6)
-        self.page_type_combo['values'] = ["Main", "Article"]
+        self.page_type_combo['values'] = ["Main", "Article", "App"]
         self.page_type_combo.state(["readonly"])
 
         self.priority_label = ttk.Label(self.frame, text='Priority:')
