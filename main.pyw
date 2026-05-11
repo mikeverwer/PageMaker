@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
+from pathlib import Path
 import os
 import re
 import json
@@ -10,11 +11,53 @@ import ctypes
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("PageMaker.MikeVerwer")
 import html_reformat
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+ICONS_DIR = SCRIPT_DIR / 'icons'
+
+
 def main():
     root = Tk()
+    configure_styles()
     PageMaker(root)
     root.mainloop()
 
+def load_icon(name: str):
+    return PhotoImage(file=str(ICONS_DIR / f"{name}.png"))
+
+def configure_styles():
+    style = ttk.Style()
+
+    # Tight up/down buttons: no vertical padding so two can stack flush.
+    # `relief` and `borderwidth` are set explicitly because some themes
+    # add their own borders that would otherwise create visual gaps.
+    style.configure(
+        'OrderArrow.TButton',
+        padding=(1, 0),                # (horizontal, vertical) in pixels
+        borderwidth=0,
+        relief='flat',
+    )
+    style.map(
+        'OrderArrow.TButton',
+        relief=[('pressed', 'sunken'), ('!pressed', 'flat')],
+    )
+
+    # Delete button with a red border. ttk doesn't expose "border color"
+    # as a simple option on most built-in themes — we have to use the
+    # 'bordercolor' element option, which works on the 'clam' theme and
+    # any theme that inherits it. If your app isn't already using clam,
+    # the styles below won't take effect; see notes after the code.
+    style.configure(
+        'Delete.TButton',
+        padding=(0, 0),
+        relief='solid'
+    )
+    style.map(
+        'Delete.TButton',
+        # bordercolor=[
+        #     ('pressed', '#922b21'),    # darker red when pressed
+        #     ('active', '#e74c3c'),     # lighter red on hover
+        # ],
+    )
 
 #  /$$$$$$$                                                             /$$  /$$$$$$  /$$   /$$               /$$$$$$$                              
 # | $$__  $$                                                           | $$ /$$__  $$|__/  | $$              | $$__  $$                             
@@ -104,25 +147,29 @@ class PersonalSitePage:
         return self.step + 1
     
     
+    def _change_header_link(self, output_filename):
+        self.log("    Adding header link...", end=" ")
+        try:
+            header_tag = self.soup.find("header")
+            a_tags = header_tag.find_all("a")
+            if len(a_tags) >= 2:
+                a_tags[1]["href"] = f"#" if output_filename != 'index' else '/about.html'
+            self.log("complete.")
+        except:
+            self.log("there is no second <a> tag within the <header> tag.")
+        return self.step + 1
+    
+
     def change_header(self, new_header, output_filename):
         if new_header:
             self.log("    Adding header...", end=" ")
             try:
-                h1_tag = self.soup.find("h1")
+                h1_tag = self.soup.find("header").find("h1")
                 h1_tag.string = new_header
                 self.log("complete.")
             except:
                 self.log("no <h1> tag found in the template.")
-            self.step = self.step + 1
-            self.log("    Adding header link...", end=" ")
-            try:
-                header_tag = self.soup.find("header")
-                a_tags = header_tag.find_all("a")
-                if len(a_tags) >= 2:
-                    a_tags[1]["href"] = f"#" if output_filename != 'index' else '/about.html'
-                self.log("complete.")
-            except:
-                self.log("there is no second <a> tag within the <header> tag.")
+            # self.step = self._change_header_link(output_filename)     # header links are now redundant
         else:
             self.log("    No header to add...", end=" ")
         return self.step + 1
@@ -188,6 +235,15 @@ class PersonalSitePage:
         except:
             self.log("No 'main-section' div found. Can not continue, skipping.")
             return self.step + 1
+        
+        # Remove 'zen-mode'
+        removals = [
+            ('div',    {'class_': 'panel-toggle-area'}),
+        ]
+        for tag_name, attrs in removals:
+            for tag in self.soup.find_all(tag_name, **attrs):
+                if tag is not None:
+                    tag.decompose()
         
         # Inject app html
         try:
@@ -291,47 +347,6 @@ class PersonalSitePage:
         li_tag.append(a_tag)
         return li_tag
 
-
-    """
-    def add_links(self, links, link_titles):
-        step = 0
-        if links:
-            step += 1
-            self.log("    Adding links...", end=" ")
-            try:
-                step += 1
-                nav_tags = []
-                nav_tags.append(self.soup.find("nav", id="rightNav"))
-                nav_tags.append(self.soup.find("nav", id="side-links"))
-                for nav_tag in nav_tags:
-                    if nav_tag and links is not None:
-                        step += 1
-                        ul_tag = nav_tag.find("ul")
-                        if ul_tag:
-                            # Create and append <li> elements with <a> tags to the <ul> tag
-                            step += 1
-                            for i, href in enumerate(links):
-                                li_tag = self.soup.new_tag("li")
-                                if " target=" in href:
-                                    link_portions = href.split()
-                                    href_portion = link_portions[0]
-                                    target_portion = link_portions[1].split('=')[1]
-                                    a_tag = self.soup.new_tag("a", href=href_portion, target=f"{target_portion}")
-                                else:
-                                    a_tag = self.soup.new_tag("a", href=href)
-                                a_tag.string = link_titles[i]
-                                li_tag.append(a_tag)
-                                ul_tag.append(li_tag)
-                            step += 1
-                        else:
-                            self.log("<nav> tag not found in the template.")
-                self.log("complete.")
-            except Exception as e:
-                self.log(f"no <nav> tag found in the template. Failed at step {step}.\n      {e}")
-        else:
-            self.log("    No links to add on the page.")
-        return self.step + 1
-    """
     
     def clean_links(self, page_type):
         self.log("      Cleaning up links...", end=" ")
@@ -529,39 +544,70 @@ class ToolTip:
 #                    | $$                                                            
 #                    |__/                                                            
 class InputRow:
-    def __init__(self, parent, number: int):
+    def __init__(self, parent, app):
         self.parent: ttk.Widget = parent
-        self.row_number = number
+        # self.row_number: int = number
+        self.app: PageMaker = app
 
         self.frame = ttk.Frame(self.parent)
-        self.frame.grid(row=self.row_number, column=0, pady=1, sticky=(E, W))
+        # self.frame.grid(row=self.row_number, column=0, pady=1, sticky=(E, W))
         self.frame.grid_rowconfigure(0, weight=1)
         self.frame.grid_rowconfigure(1, weight=1)
         self.frame.grid_columnconfigure(0, weight=1)
 
         column_counter = 0
 
-        # Row number, page type, and priority ---------------------------------------------------------------
-        self.row_label = ttk.Label(self.frame, text=str(self.row_number), font='_ 22')
+        # Row number, delete and reorder buttons ------------------------------------------------------------
+        self.row_order_frame = ttk.Frame(self.frame)
+        self.row_label = ttk.Label(self.row_order_frame, text=str(self.row_number), font=('TkDefaultFont', 22), anchor=W)
+        self.delete_icon = load_icon('garbage')
+        self.sort_up_icon = load_icon('sort-up_16px')
+        self.sort_down_icon = load_icon('sort-down_16px')
+        self.delete_row_btn = ttk.Button(
+            self.row_order_frame, 
+            image=self.delete_icon,
+            takefocus=0,
+            command=self.delete)
+        self.order_up_btn = ttk.Button(
+            self.row_order_frame, 
+            image=self.sort_up_icon, 
+            style='OrderArrow.TButton',
+            takefocus=0,
+            command=lambda: self.move(-1))
+        self.order_down_btn = ttk.Button(
+            self.row_order_frame, 
+            image=self.sort_down_icon, 
+            style='OrderArrow.TButton',
+            takefocus=0,
+            command=lambda: self.move(1))
+        # gridding
+        self.row_order_frame.grid(row=0, column=column_counter, columnspan=1, rowspan=2, padx=2)
+        self.row_label.grid(row=0, column=0, rowspan=2, sticky=(N,S,E,W))
+        self.delete_row_btn.grid(row=2, column=0, columnspan=2, sticky=(E,W))
+        self.order_up_btn.grid(row=0, column=1, sticky=(S))
+        self.order_down_btn.grid(row=1, column=1, sticky=(N))
+        column_counter += 1
 
+        # Page type, and priority ---------------------------------------------------------------------------
         self.type_frame = ttk.Frame(self.frame)
         self.page_type = StringVar(value='Main')
-        self.page_type_label = ttk.Label(self.type_frame, text="Page Type:")
+        self.page_type_label = ttk.Label(self.type_frame, text="Page Type")
         self.page_type_combo = ttk.Combobox(self.type_frame, textvariable=self.page_type, width=6)
         self.page_type_combo['values'] = ["Main", "Article", "App"]
         self.page_type_combo.state(["readonly"])
 
-        self.priority_label = ttk.Label(self.frame, text='Priority:')
-        self.priority_entry = ttk.Entry(self.frame, width=4)
+        self.priority_frame = ttk.Frame(self.frame)
+        self.priority_label = ttk.Label(self.priority_frame, text='Priority')
+        self.priority_entry = ttk.Entry(self.priority_frame, width=3)
         # layout
-        self.row_label.grid(row=0, column=column_counter, rowspan=2, columnspan=1, sticky=(N, W))
+        column_counter += 1
+
+        self.type_frame.grid(row=0, column=1, rowspan=2, sticky=(N,E))
         self.page_type_label.grid(row=0, column=0)
         self.page_type_combo.grid(row=1, column=0)
-        self.type_frame.grid(row=0, column=1, rowspan=2, sticky=N)
-        # column_counter += 1
-        self.priority_label.grid(row=1, column=column_counter)
-        column_counter += 1
-        self.priority_entry.grid(row=1, column=column_counter, padx=1, sticky=W)
+        self.priority_frame.grid(row=1, column=1, rowspan=2, sticky=E)
+        self.priority_label.grid(row=0, column=0)
+        self.priority_entry.grid(row=0, column=1, padx=1, sticky=W)
         column_counter += 1
 
         # HTML Filename -------------------------------------------------------------------------------------
@@ -627,7 +673,6 @@ class InputRow:
 
         # ---------------------------------------------------------------------------------------------------
         self.separator = ttk.Separator(self.frame, orient=HORIZONTAL)
-        # self.separator.pack(fill='x', padx=2, pady=1)
         self.separator.grid(row=3, column=0, columnspan=column_counter, sticky="ew", ipadx=4)
 
         # Dictionary of widgets that need to be saved/loaded
@@ -646,7 +691,41 @@ class InputRow:
                     "links -insert": self.links_entry,
                 }
         
-        # self.parent.see
+    @property
+    def row_number(self):
+        """Row number is based on index of the input_rows list"""
+        try:
+            return self.app.input_rows.index(self) + 1
+        except ValueError:  # During construction, before the row is added to the list
+            return len(self.app.input_rows) + 1
+    
+    def refresh_row_display(self):
+        self.row_label.config(text=str(self.row_number))
+        self.frame.grid_configure(row=self.row_number)
+
+    def delete(self):
+        self.frame.destroy()
+        deleted_row = self.row_number
+        self.app.input_rows.remove(self)
+        if not self.app.input_rows:
+            self.app.add_row() 
+        if deleted_row == 1:
+            self.app.add_initial_row_tooltips()   
+        for row in self.app.input_rows:
+            row.refresh_row_display()
+        
+    def move(self, direction: int):
+        if direction == -1 and self.row_number == 1:
+            return
+        rows = self.app.input_rows
+        if direction == 1 and (len(rows) == 1 or self.row_number == len(rows)):
+            return
+        idx = self.row_number - 1
+        idy = idx + direction
+        rows[idx], rows[idy] = rows[idy], rows[idx] 
+        rows[idx].refresh_row_display()
+        rows[idy].refresh_row_display()
+        
 
 
 
@@ -666,7 +745,7 @@ class PageMaker:
         # Root Configuration
         self.root: Tk = root
         self.root.title("WebPage Generator")
-        self.root.iconbitmap('page-maker-icon.ico')
+        self.root.iconbitmap(str(ICONS_DIR / 'page-maker-icon.ico'))
         # Keybinds
         # self.root.bind("<Configure>", self.reconfigure_window)
         self.root.bind('<Control-Button 1>', self.get_widget_info)
@@ -677,8 +756,7 @@ class PageMaker:
         self.root.bind("<MouseWheel>", self.on_mouse_wheel)
         # Globals
         self.autosave_interval = 900_000  # 15 minutes in milliseconds
-        self.cwd = os.getcwd()
-        self.configs_directory = os.path.join(self.cwd, "configs")
+        self.configs_directory = os.path.join(SCRIPT_DIR, "configs")
         self.autosave_filepath = os.path.join(self.configs_directory, "autosave.json")
         self.input_rows = []
         self.root.state('zoomed')
@@ -720,7 +798,10 @@ class PageMaker:
         self.scrollable_canvas = Canvas(self.container)
         self.scrollable_canvas.grid(row=1, column=0, sticky=(N, S, E, W))
 
-        self.canvas_scrollbar = Scrollbar(self.container, orient="vertical", command=self.scrollable_canvas.yview)
+        self.canvas_scrollbar = Scrollbar(
+            self.container, 
+            orient="vertical", 
+            command=self.scrollable_canvas.yview)
         self.canvas_scrollbar.grid(row=1, column=2, sticky=(N, S), padx=5)
 
         self.scrollable_canvas['yscrollcommand'] = self.canvas_scrollbar.set
@@ -730,7 +811,10 @@ class PageMaker:
 
         self.scrollable_frame = ttk.Frame(self.scrollable_canvas)
         self.scrollable_frame.grid(row=0, column=0, sticky=(N, E, S, W))
-        self.scrollable_frame.bind("<Configure>", lambda e: self.scrollable_canvas.configure(scrollregion=self.scrollable_canvas.bbox("all")))
+        self.scrollable_frame.bind(
+            "<Configure>", 
+            lambda e: self.scrollable_canvas.configure(
+                scrollregion=self.scrollable_canvas.bbox("all")))
 
         self.scrollable_canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.scrollable_canvas.configure(yscrollcommand=self.canvas_scrollbar.set)
@@ -749,28 +833,30 @@ class PageMaker:
         # robots.txt entry
         self.robots_text = Text(self.topbar_frame, width=40, height=8, font="Helvetica 9")
         self.robots_text.grid(row=0, column=column_counter, rowspan=8, padx=10)
-        self.robots_text.insert(0.1, '# Add content for robots.txt\nUser-agent: *\nDisallow: /private/')
+        self.robots_text.insert(0.1, 
+            '# Add content for robots.txt\nUser-agent: *\nDisallow: /private/')
         column_counter += 1
 
         # root directory with write-to-path checkbox
         self.root_dir_entry = ttk.Entry(self.topbar_frame, width=50)
         self.root_dir_entry.grid(row=0, column=column_counter, padx=5, pady=5, columnspan=2, sticky=S)
         root_dir_button = ttk.Button(self.topbar_frame, text="Select Root Directory", command=
-                                     lambda: (self.root_dir_entry.delete(0, END),  # Clear existing text
-                                              self.root_dir_entry.insert(END, filedialog.askdirectory())))
+            lambda: (self.root_dir_entry.delete(0, END),  # Clear existing text
+                    self.root_dir_entry.insert(END, filedialog.askdirectory())))
         root_dir_button.grid(row=1, column=column_counter, padx=5)
 
         # Add row/Reset buttons
         row_buttons_frame = ttk.Frame(self.topbar_frame)
         row_buttons_frame.grid(row=5, column=column_counter, columnspan=3, sticky=S)
 
-        add_row_button = ttk.Button(row_buttons_frame, text="  Add Row  ", command=self.add_row)
+        add_row_button = ttk.Button(row_buttons_frame, text="Add Row", command=self.add_row)
         add_row_button.grid(row=0, column=0, padx=10, pady=5, sticky=S)
         import_rows_button = ttk.Button(row_buttons_frame, text='Import', command=self.import_rows)
         import_rows_button.grid(row=0, column=1, padx=10, pady=5, sticky=S)
-        reset_button = ttk.Button(row_buttons_frame, text="Reset", command=lambda: (self.reset_rows(), self.add_row(), self.add_initial_row_tooltips()))
+        reset_button = ttk.Button(row_buttons_frame, text="Reset", command=lambda: (
+            self.reset_rows(), self.add_row(), self.add_initial_row_tooltips()
+        ))
         reset_button.grid(row=0, column=2, padx=10, pady=5, sticky=S)
-        # column_counter += 1
         column_counter += 1
 
         self.write_to_path = BooleanVar(value=True)
@@ -782,8 +868,11 @@ class PageMaker:
         # template HTML file entry
         self.template_entry = ttk.Entry(self.topbar_frame, width=50)
         self.template_entry.grid(row=0, column=column_counter, padx=5, pady=5, sticky=S)
-        template_button = ttk.Button(self.topbar_frame, text='Select Template File', command=lambda: (self.template_entry.delete(0, END),  # Clear existing text
-                                                                                                     self.template_entry.insert(END, filedialog.askopenfilename(defaultextension='.html'))))
+        template_button = ttk.Button(
+            self.topbar_frame, text='Select Template File', command=lambda: (
+                self.template_entry.delete(0, END),  # Clear existing text
+                self.template_entry.insert(END, filedialog.askopenfilename(defaultextension='.html'))
+        ))
         template_button.grid(row=1, column=column_counter, padx=5, pady=5)
         column_counter += 1
 
@@ -827,12 +916,18 @@ class PageMaker:
     #  ██ ████ ██ ██ ██ ██  ██ ██    ██ ██████      █████   ██    ██ ██ ██  ██ ██      ███████ 
     #  ██  ██  ██ ██ ██  ██ ██ ██    ██ ██   ██     ██      ██    ██ ██  ██ ██ ██           ██ 
     #  ██      ██ ██ ██   ████  ██████  ██   ██     ██       ██████  ██   ████  ██████ ███████ 
-    #                                                                                                                                                                                  
+    #     
+
+    def _refresh_row_displays(self):
+        for row in self.input_rows:
+            row.refresh_row_display()
+
     def add_row(self, parent=None):
         if parent is None:
             parent = self.scrollable_frame
-        new_row = InputRow(parent, len(self.input_rows) + 1)
+        new_row = InputRow(parent, self)
         self.input_rows.append(new_row)
+        new_row.frame.grid(row=new_row.row_number, column=0, pady=1, sticky=(E,W))
         self.root.update_idletasks()
         self.scrollable_canvas.yview(MOVETO, 1)
         return new_row
@@ -924,7 +1019,7 @@ class PageMaker:
     def make_files(self):
         root_path = self.root_dir_entry.get()
         if root_path == "":
-            root_path = os.path.join(self.cwd, 'outputs')
+            root_path = os.path.join(SCRIPT_DIR, 'outputs')
 
         template_file = self.template_entry.get()
         if template_file == "":
@@ -1080,7 +1175,7 @@ class PageMaker:
     #
     def save_config(self, save_file=None, autosave=False):
         if save_file is None:
-            save_file = filedialog.asksaveasfilename(filetypes=[("JSON files", "*.json")], initialdir=os.path.join(os.getcwd(), "configs"))
+            save_file = filedialog.asksaveasfilename(filetypes=[("JSON files", "*.json")], initialdir=self.configs_directory)
             save_file = f"{save_file}.json" if len(save_file.split('.')) < 2 else save_file  # make sure the file extension is present
 
         config_data = {
@@ -1117,7 +1212,7 @@ class PageMaker:
             if filename:
                 loaded_config = filename
             else:
-                loaded_config = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")], initialdir=os.path.join(os.getcwd(), "configs"))
+                loaded_config = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")], initialdir=self.configs_directory)
             with open(loaded_config, "r") as f:
                 config_data = json.load(f)
             self.log(f"Loading '{loaded_config}'...")
