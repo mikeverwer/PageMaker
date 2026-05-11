@@ -299,10 +299,9 @@ class PersonalSitePage:
 
 
     def add_links(self, links, link_titles):
-        if not links:
-            self.log("    No links to add on the page.")
-            return self.step + 1
-
+        if links is None:
+            links = []
+            link_titles = []
         if len(links) != len(link_titles):
             self.log(f"    Mismatched links/titles ({len(links)} vs {len(link_titles)}); skipping.")
             return self.step + 1
