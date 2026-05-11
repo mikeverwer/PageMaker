@@ -195,7 +195,7 @@ class PersonalSitePage:
             last_updated = ""
             if page_type == "Article":
                 last_updated =  f"Written by Mike Verwer; {article_date}"
-            elif page_type == "Main":
+            elif page_type in ["Main", "App"]:
                 last_updated = f"Last updated: {article_date}"
             try:
                 article_date_tag = self.soup.find("p", id="article-date")
