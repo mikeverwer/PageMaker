@@ -270,7 +270,7 @@ class PersonalSitePage:
             self.log(f"No dependencies found...", end=' ')
 
         deps.insert(0, self.soup.new_tag(
-            "script", src=f"/assets/apps/{output_filename}.js"))
+            "script", src=f"/assets/apps/{output_filename}/{output_filename}.js"))
         
         try:
             last_script = scripts[-1]
@@ -285,7 +285,7 @@ class PersonalSitePage:
         app_style_tag = self.soup.new_tag(
                 "link", 
                 rel="stylesheet", 
-                src=f'/assets/apps/{output_filename}.css')
+                src=f'/assets/apps/{output_filename}/{output_filename}.css')
         try:
             styles = head_tag.find_all("link", rel="stylesheet")
             last_style = styles[-1]
