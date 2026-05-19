@@ -1,1 +1,58 @@
-{"rows": 4, "input_data": [{"type -set": "Article", "priority -insert": "0.5", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "The Sieve of Eratosthenes is an ancient algorithm for finding prime numbers. It does not test for primality, but it is capable of generating a list of all prime numbers from 2 to `n` with only addition.", "html filename -insert": "eratosthenes", "md filename -insert": "", "names -insert": " The Sieve of Eratosthenes, ", "path -insert": "/articles/", "link labels -insert": "", "links -insert": ""}, {"type -set": "Article", "priority -insert": "0.5", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "The Novelties are the integers represented with a non-positional number system.  Each integer is written as a concatenation of all prime factors in its prime factorization, including multiplicity.  The twist is that the primes are represented by their index in the set of  all primes.\nThe Novelties are ordered based on the length of their concatenation. Since primes are 'atomic', they are the smallest numbers. The largest numbers will always have the length of the largest power of 2 in the set.", "html filename -insert": "the-novelties", "md filename -insert": "", "names -insert": "The Novelties, ", "path -insert": "/articles/", "link labels -insert": "", "links -insert": ""}, {"type -set": "Article", "priority -insert": "0.5", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "The Central Limit Theorem is a theorem of huge importance in statistics. It says that if you sample an experiment enough times, then the average of those samples will be a normal random variable even if the random variable of the experiment itself was not normal.", "html filename -insert": "the-clt", "md filename -insert": "", "names -insert": "The CLT, ", "path -insert": "/articles/", "link labels -insert": "", "links -insert": ""}, {"type -set": "Article", "priority -insert": "0.5", "SEO index -set": 0, "SEO follow -set": 0, "SEO description -text": "Page Template: ArticlePage", "html filename -insert": "article", "md filename -insert": "content", "names -insert": "Article, ", "path -insert": "/articles/", "link labels -insert": "", "links -insert": ""}], "project_data": {"root": "I:/Projects/code/Website/mikeverwer.github.io", "template": "I:/Projects/code/Website/mikeverwer.github.io/article.html", "robots": ""}}
+{
+  "num_rows": 4,
+  "pages": [
+    {
+      "type -set": "Article",
+      "links": [],
+      "priority -insert": "0.5",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "The Sieve of Eratosthenes is an ancient algorithm for finding prime numbers. It does not test for primality, but it is capable of generating a list of all prime numbers from 2 to `n` with only addition.",
+      "html filename -insert": "eratosthenes",
+      "md filename -insert": "",
+      "names -insert": " The Sieve of Eratosthenes, ",
+      "path -insert": "/articles/"
+    },
+    {
+      "type -set": "Article",
+      "links": [],
+      "priority -insert": "0.5",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "The Novelties are the integers represented with a non-positional number system.  Each integer is written as a concatenation of all prime factors in its prime factorization, including multiplicity.  The twist is that the primes are represented by their index in the set of  all primes.\nThe Novelties are ordered based on the length of their concatenation. Since primes are 'atomic', they are the smallest numbers. The largest numbers will always have the length of the largest power of 2 in the set.",
+      "html filename -insert": "the-novelties",
+      "md filename -insert": "",
+      "names -insert": "The Novelties, ",
+      "path -insert": "/articles/"
+    },
+    {
+      "type -set": "Article",
+      "links": [],
+      "priority -insert": "0.5",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "The Central Limit Theorem is a theorem of huge importance in statistics. It says that if you sample an experiment enough times, then the average of those samples will be a normal random variable even if the random variable of the experiment itself was not normal.",
+      "html filename -insert": "the-clt",
+      "md filename -insert": "",
+      "names -insert": "The CLT, ",
+      "path -insert": "/articles/"
+    },
+    {
+      "type -set": "Article",
+      "links": [],
+      "priority -insert": "0.5",
+      "SEO index -set": 0,
+      "SEO follow -set": 0,
+      "SEO description -text": "Page Template: ArticlePage",
+      "html filename -insert": "article",
+      "md filename -insert": "content",
+      "names -insert": "Article, ",
+      "path -insert": "/articles/"
+    }
+  ],
+  "project_data": {
+    "root": "I:/Projects/code/Website/mikeverwer.github.io",
+    "template": "I:/Projects/code/Website/mikeverwer.github.io/article.html",
+    "robots": ""
+  }
+}

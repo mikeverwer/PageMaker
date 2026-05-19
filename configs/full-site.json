@@ -1,1 +1,231 @@
-{"rows": 15, "input_data": [{"type -set": "Main", "priority -insert": "0", "SEO index -set": 0, "SEO follow -set": 0, "SEO description -text": "Template page - MainPage", "html filename -insert": "page", "md filename -insert": "content", "names -insert": "Page, Page", "path -insert": "", "link labels -insert": "", "links -insert": ""}, {"type -set": "Main", "priority -insert": "0.8", "SEO index -set": 1, "SEO follow -set": 1, "SEO description -text": "# Mike Verwer\nThe personal website of Mike Verwer, M. Sc. Mathematics.\nThis is the homepage. \nExplore the site to learn more about me.", "html filename -insert": "index", "md filename -insert": "greeting", "names -insert": "Home, Mike Verwer", "path -insert": "", "link labels -insert": "", "links -insert": ""}, {"type -set": "Main", "priority -insert": "0.4", "SEO index -set": 0, "SEO follow -set": 0, "SEO description -text": "Information about YouTube videos made by Mike Verwer. Contact me to request a video.", "html filename -insert": "youtube", "md filename -insert": ", 2025-04-10", "names -insert": "YouTube, YouTube", "path -insert": "", "link labels -insert": "", "links -insert": ""}, {"type -set": "Main", "priority -insert": "0.6", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "Explore my teaching history and the courses I teach.  You can also take a look at my teaching portfolio which contains my teaching philosophy and all of my credentials.", "html filename -insert": "teaching", "md filename -insert": ", 2025-05-10", "names -insert": "Teaching, Teaching", "path -insert": "", "link labels -insert": "Teaching Portfolio", "links -insert": "/assets/docs/teaching_portfolio.pdf target=_blank"}, {"type -set": "Main", "priority -insert": "0.6", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "Take a look at the apps Mike has written. I've made a few programs that I use in my classes to showcase various concepts.", "html filename -insert": "programs", "md filename -insert": ", 2026-05-11", "names -insert": "Programs, Programs", "path -insert": "", "link labels -insert": "Coin Flip, Roll Dice, Playing with Primes", "links -insert": "/apps/coin_flip.html, /programs/roll_dice.html, /programs/playing_with_primes.html"}, {"type -set": "Main", "priority -insert": "0.75", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "Mike Verwer graduated from McMaster University with a Masters degree in Mathematics in 2019 and has been teaching ever since.", "html filename -insert": "about", "md filename -insert": ", 2025-05-10", "names -insert": "About Me, Mike Verwer", "path -insert": "", "link labels -insert": "Bergman's Condition and Near-Unanimity Terms", "links -insert": "/assets/docs/masters_thesis.pdf"}, {"type -set": "Main", "priority -insert": "0.6", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "This is an app I've written to demonstrate the Central Limit Theorem in statistics.  I use rolling dice as an example and take the sum of the faces. It is an interactive simulation that rolls `N` dice, `T` times where each roll is remembered and displayed.", "html filename -insert": "roll_dice", "md filename -insert": ", 2025-04-20", "names -insert": "Roll Dice, Roll Dice", "path -insert": "/programs/", "link labels -insert": "The CLT", "links -insert": "/articles/the_clt.html target=_blank"}, {"type -set": "Main", "priority -insert": "0.6", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "This is an app I wrote to demonstrate the Sieve of Eratosthenes.  It animates the algorithm, and the animation can be interacted with.  The app also has a module that generates what I call The Novelties.  This is a non-positional numbering system based on prime factorizations. Numbers are represented by their prime factorizations, but the primes are represented by their index in a list of primes.", "html filename -insert": "playing_with_primes", "md filename -insert": ", 2024-02-10", "names -insert": "Primes, Primes", "path -insert": "/programs/", "link labels -insert": "The Sieve, The Novelties", "links -insert": "/articles/eratosthenes.html target=_blank, /articles/the_novelties.html target=_blank"}, {"type -set": "Main", "priority -insert": "0", "SEO index -set": 0, "SEO follow -set": 0, "SEO description -text": "404. Page not found.", "html filename -insert": "404", "md filename -insert": "", "names -insert": "Null, 404", "path -insert": "", "link labels -insert": "", "links -insert": ""}, {"type -set": "Article", "priority -insert": "0.5", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "The Sieve of Eratosthenes is an ancient algorithm for finding prime numbers. It does not test for primality, but it is capable of generating a list of all prime numbers from 2 to `n` with only addition.", "html filename -insert": "eratosthenes", "md filename -insert": ", 2024-02-12", "names -insert": " The Sieve of Eratosthenes, ", "path -insert": "/articles/", "link labels -insert": "", "links -insert": ""}, {"type -set": "Article", "priority -insert": "0.5", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "The Novelties are the integers represented with a non-positional number system.  Each integer is written as a concatenation of all prime factors in its prime factorization, including multiplicity.  The twist is that the primes are represented by their index in the set of  all primes.\nThe Novelties are ordered based on the length of their concatenation. Since primes are 'atomic', they are the smallest numbers. The largest numbers will always have the length of the largest power of 2 in the set.", "html filename -insert": "the_novelties", "md filename -insert": ", 2024-02-18", "names -insert": "The Novelties, ", "path -insert": "/articles/", "link labels -insert": "", "links -insert": ""}, {"type -set": "Article", "priority -insert": "0.5", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "The Central Limit Theorem is a theorem of huge importance in statistics. It says that if you sample an experiment enough times, then the average of those samples will be a normal random variable even if the random variable of the experiment itself was not normal.", "html filename -insert": "the_clt", "md filename -insert": ", 2024-04-20", "names -insert": "The CLT, ", "path -insert": "/articles/", "link labels -insert": "", "links -insert": ""}, {"type -set": "Article", "priority -insert": "0.5", "SEO index -set": 0, "SEO follow -set": 0, "SEO description -text": "Page Template: ArticlePage", "html filename -insert": "article", "md filename -insert": "content", "names -insert": "Article, ", "path -insert": "/articles/", "link labels -insert": "", "links -insert": ""}, {"type -set": "Article", "priority -insert": "0.1", "SEO index -set": 0, "SEO follow -set": 0, "SEO description -text": "", "html filename -insert": "journals_from_sweden", "md filename -insert": ", 2024-08-12", "names -insert": "Journals From Sweden", "path -insert": "/articles/", "link labels -insert": "", "links -insert": ""}, {"type -set": "App", "priority -insert": "0.6", "SEO index -set": 1, "SEO follow -set": 0, "SEO description -text": "Interactive coin flip simulator that visualizes the binomial distribution. Watch empirical results converge to theory as you adjust trials and probability.", "html filename -insert": "coin_flip", "md filename -insert": ", 2026-04-30", "names -insert": "Coin Flip, Coin Flip", "path -insert": "/apps/", "link labels -insert": "", "links -insert": ""}], "project_data": {"root": "D:/Projects/Code/Website/mikeverwer.github.io", "template": "D:/Projects/Code/Website/mikeverwer.github.io/programs.html", "robots": "User-agent: *\nDisallow: /assets/docs/*.pdf\nDisallow: /assets/images/\nDisallow: /private/\nDisallow: *.md\nDisallow: /page.html\nDisallow: /article.html"}}
+{
+  "num_rows": 15,
+  "pages": [
+    {
+      "type -set": "Main",
+      "links": [],
+      "priority -insert": "0",
+      "SEO index -set": 0,
+      "SEO follow -set": 0,
+      "SEO description -text": "Template page - MainPage",
+      "html filename -insert": "page",
+      "md filename -insert": "content",
+      "names -insert": "Page, Page",
+      "path -insert": ""
+    },
+    {
+      "type -set": "Main",
+      "links": [],
+      "priority -insert": "0.8",
+      "SEO index -set": 1,
+      "SEO follow -set": 1,
+      "SEO description -text": "# Mike Verwer\nThe personal website of Mike Verwer, M. Sc. Mathematics.\nThis is the homepage. \nExplore the site to learn more about me.",
+      "html filename -insert": "index",
+      "md filename -insert": "greeting",
+      "names -insert": "Home, Mike Verwer",
+      "path -insert": ""
+    },
+    {
+      "type -set": "Main",
+      "links": [],
+      "priority -insert": "0.4",
+      "SEO index -set": 0,
+      "SEO follow -set": 0,
+      "SEO description -text": "Information about YouTube videos made by Mike Verwer. Contact me to request a video.",
+      "html filename -insert": "youtube",
+      "md filename -insert": ", 2025-04-10",
+      "names -insert": "YouTube, YouTube",
+      "path -insert": ""
+    },
+    {
+      "type -set": "Main",
+      "links": [
+        {
+          "label": "Teaching Portfolio",
+          "url": "/assets/docs/teaching_portfolio.pdf",
+          "target": "_blank"
+        }
+      ],
+      "priority -insert": "0.6",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "Explore my teaching history and the courses I teach.  You can also take a look at my teaching portfolio which contains my teaching philosophy and all of my credentials.",
+      "html filename -insert": "teaching",
+      "md filename -insert": ", 2025-05-10",
+      "names -insert": "Teaching, Teaching",
+      "path -insert": ""
+    },
+    {
+      "type -set": "Main",
+      "links": [
+        {
+          "label": "Coin Flip",
+          "url": "/apps/coin_flip.html"
+        },
+        {
+          "label": "Roll Dice",
+          "url": "/programs/roll_dice.html"
+        },
+        {
+          "label": "Playing with Primes",
+          "url": "/programs/playing_with_primes.html"
+        }
+      ],
+      "priority -insert": "0.6",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "Take a look at the apps Mike has written. I've made a few programs that I use in my classes to showcase various concepts.",
+      "html filename -insert": "programs",
+      "md filename -insert": ", 2026-05-11",
+      "names -insert": "Programs, Programs",
+      "path -insert": ""
+    },
+    {
+      "type -set": "Main",
+      "links": [
+        {
+          "label": "Bergman's Condition and Near-Unanimity Terms",
+          "url": "/assets/docs/masters_thesis.pdf"
+        }
+      ],
+      "priority -insert": "0.75",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "Mike Verwer graduated from McMaster University with a Masters degree in Mathematics in 2019 and has been teaching ever since.",
+      "html filename -insert": "about",
+      "md filename -insert": ", 2025-05-10",
+      "names -insert": "About Me, Mike Verwer",
+      "path -insert": ""
+    },
+    {
+      "type -set": "Main",
+      "links": [
+        {
+          "label": "The CLT",
+          "url": "/articles/the_clt.html",
+          "target": "_blank"
+        }
+      ],
+      "priority -insert": "0.6",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "This is an app I've written to demonstrate the Central Limit Theorem in statistics.  I use rolling dice as an example and take the sum of the faces. It is an interactive simulation that rolls `N` dice, `T` times where each roll is remembered and displayed.",
+      "html filename -insert": "roll_dice",
+      "md filename -insert": ", 2025-04-20",
+      "names -insert": "Roll Dice, Roll Dice",
+      "path -insert": "/programs/"
+    },
+    {
+      "type -set": "Main",
+      "links": [
+        {
+          "label": "The Sieve",
+          "url": "/articles/eratosthenes.html",
+          "target": "_blank"
+        },
+        {
+          "label": "The Novelties",
+          "url": "/articles/the_novelties.html",
+          "target": "_blank"
+        }
+      ],
+      "priority -insert": "0.6",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "This is an app I wrote to demonstrate the Sieve of Eratosthenes.  It animates the algorithm, and the animation can be interacted with.  The app also has a module that generates what I call The Novelties.  This is a non-positional numbering system based on prime factorizations. Numbers are represented by their prime factorizations, but the primes are represented by their index in a list of primes.",
+      "html filename -insert": "playing_with_primes",
+      "md filename -insert": ", 2024-02-10",
+      "names -insert": "Primes, Primes",
+      "path -insert": "/programs/"
+    },
+    {
+      "type -set": "Main",
+      "links": [],
+      "priority -insert": "0",
+      "SEO index -set": 0,
+      "SEO follow -set": 0,
+      "SEO description -text": "404. Page not found.",
+      "html filename -insert": "404",
+      "md filename -insert": "",
+      "names -insert": "Null, 404",
+      "path -insert": ""
+    },
+    {
+      "type -set": "Article",
+      "links": [],
+      "priority -insert": "0.5",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "The Sieve of Eratosthenes is an ancient algorithm for finding prime numbers. It does not test for primality, but it is capable of generating a list of all prime numbers from 2 to `n` with only addition.",
+      "html filename -insert": "eratosthenes",
+      "md filename -insert": ", 2024-02-12",
+      "names -insert": " The Sieve of Eratosthenes, ",
+      "path -insert": "/articles/"
+    },
+    {
+      "type -set": "Article",
+      "links": [],
+      "priority -insert": "0.5",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "The Novelties are the integers represented with a non-positional number system.  Each integer is written as a concatenation of all prime factors in its prime factorization, including multiplicity.  The twist is that the primes are represented by their index in the set of  all primes.\nThe Novelties are ordered based on the length of their concatenation. Since primes are 'atomic', they are the smallest numbers. The largest numbers will always have the length of the largest power of 2 in the set.",
+      "html filename -insert": "the_novelties",
+      "md filename -insert": ", 2024-02-18",
+      "names -insert": "The Novelties, ",
+      "path -insert": "/articles/"
+    },
+    {
+      "type -set": "Article",
+      "links": [],
+      "priority -insert": "0.5",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "The Central Limit Theorem is a theorem of huge importance in statistics. It says that if you sample an experiment enough times, then the average of those samples will be a normal random variable even if the random variable of the experiment itself was not normal.",
+      "html filename -insert": "the_clt",
+      "md filename -insert": ", 2024-04-20",
+      "names -insert": "The CLT, ",
+      "path -insert": "/articles/"
+    },
+    {
+      "type -set": "Article",
+      "links": [],
+      "priority -insert": "0.5",
+      "SEO index -set": 0,
+      "SEO follow -set": 0,
+      "SEO description -text": "Page Template: ArticlePage",
+      "html filename -insert": "article",
+      "md filename -insert": "content",
+      "names -insert": "Article, ",
+      "path -insert": "/articles/"
+    },
+    {
+      "type -set": "Article",
+      "links": [],
+      "priority -insert": "0.1",
+      "SEO index -set": 0,
+      "SEO follow -set": 0,
+      "SEO description -text": "",
+      "html filename -insert": "journals_from_sweden",
+      "md filename -insert": ", 2024-08-12",
+      "names -insert": "Journals From Sweden",
+      "path -insert": "/articles/"
+    },
+    {
+      "type -set": "App",
+      "links": [],
+      "priority -insert": "0.6",
+      "SEO index -set": 1,
+      "SEO follow -set": 0,
+      "SEO description -text": "Interactive coin flip simulator that visualizes the binomial distribution. Watch empirical results converge to theory as you adjust trials and probability.",
+      "html filename -insert": "coin_flip",
+      "md filename -insert": ", 2026-04-30",
+      "names -insert": "Coin Flip, Coin Flip",
+      "path -insert": "/apps/"
+    }
+  ],
+  "project_data": {
+    "root": "D:/Projects/Code/Website/mikeverwer.github.io",
+    "template": "D:/Projects/Code/Website/mikeverwer.github.io/programs.html",
+    "robots": "User-agent: *\nDisallow: /assets/docs/*.pdf\nDisallow: /assets/images/\nDisallow: /private/\nDisallow: *.md\nDisallow: /page.html\nDisallow: /article.html"
+  }
+}
