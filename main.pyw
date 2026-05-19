@@ -120,21 +120,6 @@ def apply_dark_theme(root):
 
     apply_custom_checkbox(root, style, SURFACE, BORDER, ACCENT, FG, size=16)
 
-def configure_styles():
-    style = ttk.Style()
-    # Tight up/down buttons: no vertical padding so two can stack flush.
-    # `relief` and `borderwidth` are set explicitly because some themes
-    # add their own borders that would otherwise create visual gaps.
-    style.configure(
-        'OrderArrow.TButton',
-        padding=(2, 1),                # (horizontal, vertical) in pixels
-        borderwidth=1,
-        relief='solid',
-    )
-    style.map(
-        'OrderArrow.TButton',
-        relief=[('pressed', 'sunken'), ('!pressed', 'flat')],
-    )
 
 def _checkbox_images(surface, border, accent, fg, size=14, gap=5, radius=3):
     # Unchecked: empty rounded square with border
@@ -175,6 +160,23 @@ def apply_custom_checkbox(root, style, surface, border, accent, fg, size):
             ]})
         ]})
     ])
+
+
+def configure_styles():
+    style = ttk.Style()
+    # Tight up/down buttons: no vertical padding so two can stack flush.
+    # `relief` and `borderwidth` are set explicitly because some themes
+    # add their own borders that would otherwise create visual gaps.
+    style.configure(
+        'OrderArrow.TButton',
+        padding=(2, 1),                # (horizontal, vertical) in pixels
+        borderwidth=1,
+        relief='solid',
+    )
+    style.map(
+        'OrderArrow.TButton',
+        relief=[('pressed', 'sunken'), ('!pressed', 'flat')],
+    )
 
 def center_window(window: Toplevel | Tk):
     screen_width = window.winfo_screenwidth()
