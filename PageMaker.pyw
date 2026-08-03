@@ -1094,7 +1094,7 @@ class PageMaker:
     def __init__(self, root: Tk):
         # Root Configuration
         self.root: Tk = root
-        self.root.title("WebPage Generator")
+        self.root.title("PageMaker")
         self.root.iconbitmap(str(ICONS_DIR / 'page-maker-icon.ico'))
         # Keybinds
         # self.root.bind("<Configure>", self.reconfigure_window)
