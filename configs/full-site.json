@@ -1,5 +1,5 @@
 {
-  "num_rows": 21,
+  "num_rows": 22,
   "pages": [
     {
       "type -set": "Main",
@@ -320,6 +320,18 @@
       "md filename -insert": ", 2026-07-23",
       "names -insert": "College Ad Posting Database - Views, College Ad Posting Database",
       "path -insert": "/projects/ad_posting_db/"
+    },
+    {
+      "type -set": "App",
+      "links": [],
+      "priority -insert": "0.4",
+      "SEO index -set": 0,
+      "SEO follow -set": 0,
+      "SEO description -text": "A template file for the `app` page type. An app file has an app-container div thatt gets injected with any HTML the app needs.",
+      "html filename -insert": "app",
+      "md filename -insert": ", 2026-08-02",
+      "names -insert": "App Template, App Template",
+      "path -insert": "/apps/"
     }
   ],
   "project_data": {
