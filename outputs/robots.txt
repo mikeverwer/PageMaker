@@ -1,9 +1,0 @@
-User-agent: *
-Disallow: /assets/docs/*.pdf
-Disallow: /assets/images/
-Disallow: /private/
-Disallow: *.md
-Disallow: /page.html
-Disallow: /article.html
-
-Sitemap: https://mikeverwer.github.io/sitemap.xml
