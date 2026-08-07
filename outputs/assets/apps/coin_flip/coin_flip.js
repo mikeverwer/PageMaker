@@ -255,7 +255,12 @@ function buildPlot() {
         plot_bgcolor: '#eaeaea'
     };
 
-    Plotly.react('flip-plot', [theoreticalTrace, dotTrace, placeholderTrace], layout);
+    Plotly.react(
+        'flip-plot',
+        [theoreticalTrace, dotTrace, placeholderTrace],
+        layout,
+        { responsive: true }
+    );
     showTheoreticalLine();  // clear any stale stroke-dash from prior animation
 }
 
@@ -325,14 +330,25 @@ function runSimulation() {
 }
 
 // ── Event wiring ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('prob-heads').addEventListener('input', () => {
+        const p = parseFloat(document.getElementById('prob-heads').value);
+        document.getElementById('prob-display').textContent = p.toFixed(2);
+        buildPlot();
+    });
+    document.getElementById('num-coins').addEventListener('input', buildPlot);
+    document.getElementById('num-trials').addEventListener('input', buildPlot);
+    document.getElementById('run-btn').addEventListener('click', runSimulation);
+    window.addEventListener("keydown", (e) => {
+        if (e.code.includes("Enter")) {
+            runSimulation();
+        }
+    })
+    
+    const plotResizeObserver = new ResizeObserver(() => {
+        Plotly.Plots.resize('flip-plot');
+    });
+    plotResizeObserver.observe(document.getElementById('flip-plot'));
 
-document.getElementById('prob-heads').addEventListener('input', () => {
-    const p = parseFloat(document.getElementById('prob-heads').value);
-    document.getElementById('prob-display').textContent = p.toFixed(2);
     buildPlot();
 });
-document.getElementById('num-coins').addEventListener('input', buildPlot);
-document.getElementById('num-trials').addEventListener('input', buildPlot);
-document.getElementById('run-btn').addEventListener('click', runSimulation);
-
-buildPlot();

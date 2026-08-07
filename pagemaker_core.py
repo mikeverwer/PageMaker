@@ -47,13 +47,13 @@ class PersonalSitePage:
             # | class="markdown-content" | Markdown Content | output_file OR md_filename, prioritizes md_filename
             
             self.step = self.change_title(new_title=new_title)
-            self.step = self.change_header(new_header=new_header, output_filename=output_filename)
+            # self.step = self.change_header(new_header=new_header, output_filename=output_filename)  # Deprecated
             self.step = self.change_article(output_filename=output_filename, md_filename=md_filename, page_type=page_type)
             self.step = self.add_app(page_type=page_type, root=root, output_filename=output_filename)
             self.step = self.add_links(links=links)           
             self.step = self.clean_links(page_type=page_type)
             # meta content 
-            # self.step = self.set_styles(page_type=page_type)      Deprecated - all pages now use the same css
+            # self.step = self.set_styles(page_type=page_type)            # Deprecated - all pages now use the same css
             self.step = self.change_meta(index=index, follow=follow, description=description)
             self.step = self.last_mod_date()
             # Final step before sitemap - set filepath and write file to path
@@ -66,13 +66,7 @@ class PersonalSitePage:
             raise
 
 
-
-    #  ███    ███ ███████ ████████ ██   ██  ██████  ██████  ███████ 
-    #  ████  ████ ██         ██    ██   ██ ██    ██ ██   ██ ██      
-    #  ██ ████ ██ █████      ██    ███████ ██    ██ ██   ██ ███████ 
-    #  ██  ██  ██ ██         ██    ██   ██ ██    ██ ██   ██      ██ 
-    #  ██      ██ ███████    ██    ██   ██  ██████  ██████  ███████ 
-    #                                                               
+    # ----- Methods ----------------------------------------------------------------------------------------------------
     
     def clean_path(self, path_to_page):
         if path_to_page[0] != '/' and path_to_page[0] != '\\':
@@ -158,25 +152,34 @@ class PersonalSitePage:
                 article_tag.append(article_date_tag)
                 self.log("date added.")
         else:
-            self.log("No date to add.")
+            self.log("No date to add, removing...", end=" ")
+            try:
+                self.soup.find("p", id="article-date").decompose()
+                self.log("date tag removed.")
+            except Exception as e:
+                self.log("No date tag to edit, continuing.")
+
         return self.step + 1
     
     
     def add_app(self, page_type, root, output_filename):
         if page_type != "App":
             return self.step + 1
+        self.log("    Adding the app...", end=" ")
         # files are located in root/assets/apps/output_filename
         # inject content.html into main-section div (insert at top)
-        # add <link rel="stylesheet" href="root/assets/apps/{output_filename}/app.css">
+        # add <link rel="stylesheet" href="root/assets/apps/{output_filename}/{output_filename}.css">
         # check /../apps/name/deps.txt for required libraries
-        # add <script src=""
-        self.log("    Adding the app...", end=" ")
-        asset_path = f'{root}/assets/apps/{output_filename}'
+        # add <script src="">
+        asset_directory_name = output_filename if output_filename !=  'index' else 'heart_surface'
+        local_asset_directory = f'{root}/assets/apps/{asset_directory_name}'                    # used to append /content.html or /deps.txt
+        relative_asset_path = f'/assets/apps/{asset_directory_name}/{asset_directory_name}'     # only needs an appended file extension
+
         head_tag = self.soup.find("head")
         scripts = head_tag.find_all("script")
 
-        if not os.path.isdir(asset_path):
-            self.log(f"No app assets directory found at {asset_path}, skipping.")
+        if not os.path.isdir(local_asset_directory):
+            self.log(f"No app assets directory found at {local_asset_directory}, skipping.")
             return self.step + 1
         
         try:
@@ -185,23 +188,17 @@ class PersonalSitePage:
             self.log("No 'main-section' div found. Can not continue, skipping.")
             return self.step + 1
         
-        # Remove 'zen-mode'
-        removals = [
-            ('div',    {'class_': 'panel-toggle-area'}),
-        ]
-        for tag_name, attrs in removals:
-            for tag in self.soup.find_all(tag_name, **attrs):
-                if tag is not None:
-                    tag.decompose()
-        
         # Inject app html
         try:
-            with open(f'{asset_path}/content.html', "r", encoding="utf-8") as html_file:
+            with open(f'{local_asset_directory}/content.html', "r", encoding="utf-8") as html_file:
                 app_html = html_file.read()
             app_soup = BeautifulSoup(app_html, "html.parser")
             app_container_div = self.soup.new_tag("div", id="app-container")
             app_container_div.append(app_soup)
-            main_section_tag.insert(0, app_container_div)
+            if output_filename != 'index':
+                main_section_tag.insert(0, app_container_div)   # typical apps want their html above the article
+            else:   
+                main_section_tag.append(app_container_div)      # The homepage needs its app after the article
             self.log("App HTML injected...", end=' ')
         except FileNotFoundError:
             self.log("No app HTML found, skipping.")
@@ -211,15 +208,15 @@ class PersonalSitePage:
         self.log("Adding scripts...", end=' ')
         deps = []
         try:
-            with open(f"{asset_path}/deps.txt", "r") as deps_file:
+            with open(f"{local_asset_directory}/deps.txt", "r") as deps_file:
                 for dep in deps_file:
                     link = dep.strip()
                     deps.insert(0, self.soup.new_tag("script", src=link))
         except FileNotFoundError:
             self.log(f"No dependencies found...", end=' ')
 
-        deps.insert(0, self.soup.new_tag(
-            "script", src=f"/assets/apps/{output_filename}/{output_filename}.js"))
+        # add app javascript
+        deps.insert(0, self.soup.new_tag("script", src=f"{relative_asset_path}.js"))
         
         try:
             last_script = scripts[-1]
@@ -234,7 +231,7 @@ class PersonalSitePage:
         app_style_tag = self.soup.new_tag(
                 "link", 
                 rel="stylesheet", 
-                href=f'/assets/apps/{output_filename}/{output_filename}.css')
+                href=f'{relative_asset_path}.css')
         try:
             styles = head_tag.find_all("link", rel="stylesheet")
             last_style = styles[-1]

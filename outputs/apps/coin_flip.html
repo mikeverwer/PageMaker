@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="index, nofollow" name="robots">
-    <meta content="description" name="description">
+    <meta content="Interactive coin flip simulator that visualizes the binomial distribution. Watch empirical results converge to theory as you adjust trials and probability." name="description">
     <link href="/assets/images/favicon.png" rel="icon" type="image/png">
     <!-- Styles -->
     <link href="/styles/reset.css" rel="stylesheet">
@@ -30,15 +30,13 @@
     <script src="/js/marked-footnote.js"></script>
     <script src="/js/render-markdown.js" type="module"></script>
     <script defer="" src="/js/identify-current-link.js"></script>
+    <script defer="" src="/js/heading-toc.js"></script>
     <script src="https://cdn.plot.ly/plotly-3.5.0.min.js"></script>
-    <script src="https://cdn.fakesourece1.js"></script>
-    <script src="https://cdn.fakesourece2.js"></script>
-    <script src="https://cdn.fakesourece3.js"></script>
     <script src="/assets/apps/coin_flip/coin_flip.js"></script>
   </head>
   <body>
     <!-- "zen-mode" button (hides/shows both nav bars) -->
-    <button id="toggle-sidebars">{ }</button>
+    <button id="toggle-sidebars" title="Toggle focus mode">{ }</button>
     <header>
       <a href="https://mikeverwer.github.io/index.html"><img alt="Home" id="home-button" src="/assets/images/website-icon-1.png"></a>
       <h1>Coin Flip</h1>
@@ -48,23 +46,22 @@
       <ul>
         <li><a href="/about.html">About Me</a></li>
         <li><a href="/teaching.html">Teaching</a></li>
-        <li><a href="/programs.html">Programs</a></li>
+        <li><a href="/projects.html">Projects</a></li>
         <li><a href="https://github.com/mikeverwer/" target="_blank">GitHub</a></li>
-        <li><a href="/youtube.html">Youtube</a></li>
+        <li><a href="/youtube.html">YouTube</a></li>
       </ul>
     </nav>
     <nav class="horizontal-nav side-links" id="side-links">
       <ul></ul>
     </nav>
     <div class="container">
-      <!-- Toggle Area -->
       <nav class="vertical-nav main-links" id="leftNav">
         <ul>
           <li><a href="/about.html">About Me</a></li>
           <li><a href="/teaching.html">Teaching</a></li>
-          <li><a href="/programs.html">Programs</a></li>
+          <li><a href="/projects.html">Projects</a></li>
           <li><a href="https://github.com/mikeverwer/" target="_blank">GitHub</a></li>
-          <li><a href="/youtube.html">Youtube</a></li>
+          <li><a href="/youtube.html">YouTube</a></li>
         </ul>
       </nav>
       <div class="main-section">
@@ -79,19 +76,18 @@
         </div>
         <article>
           <div class="markdown-body" id="markdown-content" src="/assets/docs/apps/coin_flip.md"></div>
-          <p id="article-date">Last updated: 2025-04-20</p>
+          <p id="article-date">Last updated: 2026-04-30</p>
         </article>
       </div>
       <nav class="vertical-nav side-links" id="rightNav">
         <ul></ul>
       </nav>
-      <!-- Navbar Toggle Area -->
     </div>
     <div class="vspace"></div>
     <footer>
       <div class="author">Made by Mike Verwer</div>
       <div class="secret-container">
-        <div class="last-modified">Last Modified: <span class="date-modified">2026-05-14</span></div>
+        <div class="last-modified">Last Modified: <span class="date-modified">2026-08-06</span></div>
         <a href="/secret.html"><img alt="Golden rectangle" class="bottom-right-image" src="/assets/images/golden-rectangle.png"></a>
       </div>
     </footer>

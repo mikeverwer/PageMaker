@@ -1,11 +1,11 @@
 /* ── Coin Flip App ───────────────────────────────────────────────── */
 
-#coin-flip-app {
-    flex: 1 1 1200px;
+#app-container {
     display: flex;
     flex-flow: column nowrap;
     gap: 24px;
-    padding: 24px 16px;
+    padding: 24px 0;
+    width: 100%;
     min-width: 0; /* prevent flex blowout */
     max-width: 1200px;
 }
@@ -82,27 +82,15 @@
     color: white;
 }
 
-/* ── Plots ───────────────────────────────────────────────────────── */
+/* ── Plot -───────────────────────────────────────────────────────── */
 
-#plots {
-    display: flex;
-    flex-flow: row nowrap;
-    gap: 16px;
-    min-width: 0;
-}
-
-#theoretical-plot,
 #flip-plot {
     flex: 1 1 0;
-    min-width: 0;
+    min-width: 100%;
     min-height: 400px;
 }
 
-/* ── Article ─────────────────────────────────────────────────────── */
 
-#coin-flip-app article {
-  flex: 0 1 auto;
-}
 
 /* ── Mobile ──────────────────────────────────────────────────────── */
 
@@ -122,7 +110,4 @@
         width: 100%;
     }
 
-    #plots {
-        flex-flow: column nowrap;
-    }
 }

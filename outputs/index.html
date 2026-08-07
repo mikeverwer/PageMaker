@@ -4,16 +4,17 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="index, follow" name="robots">
-    <meta content="# Mike Verwer
-The personal website of Mike Verwer, M. Sc. Mathematics.
-This is the homepage. explore the site to learn more about me." name="description">
-    <link href="/assets/images/favicon.png" rel="icon" type="image/png">
+    <meta content="The personal website of Mike Verwer, M. Sc. Mathematics.
+This is the homepage. 
+Explore the site to learn more about me." name="description">
+    <link href="assets/images/favicon.png" rel="icon" type="image/png">
     <!-- Styles -->
-    <link href="/styles/reset.css" rel="stylesheet">
-    <link href="/styles/main-styles.css" rel="stylesheet">
-    <link href="/styles/markdown-styles.css" rel="stylesheet">
-    <link href="/styles/syntax-highlighting-material.css" rel="stylesheet">
-    <title>home</title>
+    <link href="styles/reset.css" rel="stylesheet">
+    <link href="styles/main-styles.css" rel="stylesheet">
+    <link href="styles/markdown-styles.css" rel="stylesheet">
+    <link href="styles/syntax-highlighting-material.css" rel="stylesheet">
+    <link href="assets/apps/heart_surface/heart_surface.css" rel="stylesheet">
+    <title>Home</title>
     <!-- MathJax -->
     <script>
    window.MathJax = {
@@ -27,14 +28,17 @@ This is the homepage. explore the site to learn more about me." name="descriptio
     <!-- Mermaid import-->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
     <!-- Local scripts -->
-    <script src="/js/scripts.js"></script>
-    <script src="/js/marked-footnote.js"></script>
-    <script src="/js/render-markdown.js" type="module"></script>
-    <script defer="" src="/js/identify-current-link.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/marked-footnote.js"></script>
+    <script src="js/render-markdown.js" type="module"></script>
+    <script defer="" src="js/identify-current-link.js"></script>
+    <script defer="" src="js/heading-toc.js"></script>
+    <script src="https://cdn.plot.ly/plotly-3.5.0.min.js"></script>
+    <script src="assets/apps/heart_surface/heart_surface.js"></script>
   </head>
   <body>
     <!-- "zen-mode" button (hides/shows both nav bars) -->
-    <button id="toggle-sidebars">{ }</button>
+    <button id="toggle-sidebars" title="Toggle focus mode">{ }</button>
     <header>
       <a href="https://mikeverwer.github.io/index.html"><img alt="Home" id="home-button" src="/assets/images/website-icon-1.png"></a>
       <h1>Mike Verwer</h1>
@@ -44,43 +48,44 @@ This is the homepage. explore the site to learn more about me." name="descriptio
       <ul>
         <li><a href="/about.html">About Me</a></li>
         <li><a href="/teaching.html">Teaching</a></li>
-        <li><a href="/programs.html">Programs</a></li>
+        <li><a href="/projects.html">Projects</a></li>
         <li><a href="https://github.com/mikeverwer/" target="_blank">GitHub</a></li>
-        <li><a href="/youtube.html">Youtube</a></li>
+        <li><a href="/youtube.html">YouTube</a></li>
       </ul>
     </nav>
     <nav class="horizontal-nav side-links" id="side-links">
       <ul></ul>
     </nav>
     <div class="container">
-      <!-- Toggle Area -->
-      <div class="panel-toggle-area" id="left-side"></div>
       <nav class="vertical-nav main-links" id="leftNav">
         <ul>
           <li><a href="/about.html">About Me</a></li>
           <li><a href="/teaching.html">Teaching</a></li>
-          <li><a href="/programs.html">Programs</a></li>
+          <li><a href="/projects.html">Projects</a></li>
           <li><a href="https://github.com/mikeverwer/" target="_blank">GitHub</a></li>
-          <li><a href="/youtube.html">Youtube</a></li>
+          <li><a href="/youtube.html">YouTube</a></li>
         </ul>
       </nav>
       <div class="main-section">
         <article>
-          <div class="markdown-body" id="markdown-content" src="/assets/docs/greeting.md"></div>
-          <p id="article-date">Last updated: 2025-04-20</p>
+          <div class="markdown-body" id="markdown-content" src="assets/docs/greeting.md"></div>
         </article>
+        <div id="app-container">
+          <div class="heart-surface-app" data-state="equation" id="heart-surface-app">
+            <button aria-controls="heart-surface-plot" aria-expanded="false" aria-label="Reveal an interactive 3D render of this surface" class="heart-surface-toggle" id="heart-surface-toggle" type="button"><span class="heart-surface-eq">\[ \left(2x^{2}+y^{2}+z^{2}-1\right)^{3} - \frac{x^{2}z^{3}}{10} - y^{2}z^{3} = 0 \]</span></button>
+            <div class="heart-surface-plot" id="heart-surface-plot"><button aria-label="Back to equation" class="heart-surface-back" id="heart-surface-back" type="button">×</button></div>
+          </div>
+        </div>
       </div>
       <nav class="vertical-nav side-links" id="rightNav">
         <ul></ul>
       </nav>
-      <!-- Navbar Toggle Area -->
-      <div class="panel-toggle-area" id="right-side"></div>
     </div>
     <div class="vspace"></div>
     <footer>
       <div class="author">Made by Mike Verwer</div>
       <div class="secret-container">
-        <div class="last-modified">Last Modified: <span class="date-modified">2026-05-14</span></div>
+        <div class="last-modified">Last Modified: <span class="date-modified">2026-08-06</span></div>
         <a href="/secret.html"><img alt="Golden rectangle" class="bottom-right-image" src="/assets/images/golden-rectangle.png"></a>
       </div>
     </footer>

@@ -10,6 +10,7 @@
   font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 1.1em;
   word-wrap: break-word;
+  line-height: 1.55em;
 }
 
 .markdown-body a {
@@ -209,15 +210,14 @@ path {
     background-color: transparent;
     border: none;
     position:absolute;
-    top: 10px;
-    right: 10px;
-    padding: 10px;
-    border-radius: 4px;
-    color: white;
+    top: 0.5em;
+    right: 0.5em;
+    padding: 5px;
+    border-radius: 2px;
 }
 
 .copy-button:hover {
-    background-color: #555555;
+    background-color: #1b1b1b;
     cursor: pointer;
 }
 
@@ -452,17 +452,20 @@ path {
   max-width: 100%;
   box-sizing: content-box;
   background-color: #fff;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+
 .markdown-body code {
-  padding: 0;
-  padding-top: 0.2em;
-  padding-bottom: 0.2em;
+  padding: 0.05em 0;
   margin: 0;
   font-size: 85%;
-  background-color: #314549;
+  background-color: rgba(49, 69, 73, 0.04); /* faint tint instead of solid fill */
   border-radius: 3px;
-  color: #eeffff;
+  color: #195B8B;
+  border: thin solid rgba(49, 69, 73, 0.32)
 }
 
 .markdown-body code:before,
@@ -479,6 +482,7 @@ path {
   white-space: pre;
   background: transparent;
   border: 0;
+  color: #eeffff;
 }
 
 .markdown-body .highlight {
@@ -491,7 +495,7 @@ path {
   overflow: auto;
   font-size: 85%;
   line-height: 1.45;
-  background-color: #314549;
+  background-color: #383e4a;
   border-radius: 3px;
 }
 
@@ -559,6 +563,10 @@ path {
 
 .markdown-body .mermaid {
     padding-top: 1em;
+}
+
+.markdown-body .mermaid svg {
+    margin: 0 auto;
 }
 
 /* Manual mapping for each language */

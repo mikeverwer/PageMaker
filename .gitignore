@@ -30,3 +30,6 @@ htmlcov/
 
 # IDE
 .vscode/
+
+# Output folder
+outputs/

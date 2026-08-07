@@ -1,0 +1,24 @@
+/* ── Cyber Events Embedded Dashboard ─────────────────────────────────────── */
+
+#app-container {
+    background-color: #eaeaea;
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 24px;
+    padding: 24px 0;
+    width: 100%;
+    min-width: 0; /* prevent flex blowout */
+    max-width: 1200px;
+}
+
+#embedding-container {
+    width: 100%;
+    max-width: 1040px;
+    margin-inline: auto;
+}
+.zen #embedding-container {
+  width: 1040px;               /* keep viz at full width */
+  max-width: none;
+  margin-left: 50%;
+  transform: translateX(-50%); /* center it, let it break out of the narrowed column */
+}

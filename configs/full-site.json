@@ -10,11 +10,11 @@
       "SEO description -text": "Template page - MainPage",
       "html filename -insert": "page",
       "md filename -insert": "content",
-      "names -insert": "Page, Page",
+      "names -insert": "Page",
       "path -insert": ""
     },
     {
-      "type -set": "Main",
+      "type -set": "App",
       "links": [],
       "priority -insert": "0.8",
       "SEO index -set": 1,
@@ -22,7 +22,7 @@
       "SEO description -text": "The personal website of Mike Verwer, M. Sc. Mathematics.\nThis is the homepage. \nExplore the site to learn more about me.",
       "html filename -insert": "index",
       "md filename -insert": "greeting",
-      "names -insert": "Home, Mike Verwer",
+      "names -insert": "Home",
       "path -insert": ""
     },
     {
@@ -34,7 +34,7 @@
       "SEO description -text": "Information about YouTube videos made by Mike Verwer. Contact me to request a video.",
       "html filename -insert": "youtube",
       "md filename -insert": ", 2025-04-10",
-      "names -insert": "YouTube, YouTube",
+      "names -insert": "YouTube",
       "path -insert": ""
     },
     {
@@ -52,7 +52,7 @@
       "SEO description -text": "Explore my teaching history and the courses I teach.  You can also take a look at my teaching portfolio which contains my teaching philosophy and all of my credentials.",
       "html filename -insert": "teaching",
       "md filename -insert": ", 2025-05-10",
-      "names -insert": "Teaching, Teaching",
+      "names -insert": "Teaching",
       "path -insert": ""
     },
     {
@@ -93,7 +93,7 @@
       "SEO description -text": "A tools-and-automation portfolio spanning mathematical visualization, applied data projects, and workflow automation.",
       "html filename -insert": "projects",
       "md filename -insert": ", 2026-07-12",
-      "names -insert": "Projects, Projects",
+      "names -insert": "Projects",
       "path -insert": ""
     },
     {
@@ -110,7 +110,7 @@
       "SEO description -text": "Mike Verwer holds a Master's in Mathematics from McMaster University and taught math and statistics for six years before moving into data analytics and engineering.",
       "html filename -insert": "about",
       "md filename -insert": ", 2026-07-17",
-      "names -insert": "About Me, Mike Verwer",
+      "names -insert": "About Me",
       "path -insert": ""
     },
     {
@@ -122,7 +122,7 @@
       "SEO description -text": "Interactive coin flip simulator that visualizes the binomial distribution. Watch empirical results converge to theory as you adjust trials and probability.",
       "html filename -insert": "coin_flip",
       "md filename -insert": ", 2026-04-30",
-      "names -insert": "Coin Flip, Coin Flip",
+      "names -insert": "Coin Flip",
       "path -insert": "/apps/"
     },
     {
@@ -134,7 +134,7 @@
       "SEO description -text": "An interactive Tableau dashboard exploring twelve years of publicly reported cyber events, built on the University of Maryland's Cyber Events Database.",
       "html filename -insert": "cyber_events",
       "md filename -insert": ", 2026-07-16",
-      "names -insert": "Cyber Events, Cyber Events",
+      "names -insert": "Cyber Events",
       "path -insert": "/apps/"
     },
     {
@@ -146,7 +146,7 @@
       "SEO description -text": "A configurable, leakage-safe ML pipeline framework in scikit-learn, used to run 56 experiments and diagnose a signal-free dataset.",
       "html filename -insert": "ml-pipeline",
       "md filename -insert": ", 2026-07-12",
-      "names -insert": "ML Pipeline Factory, ML Pipeline Factory",
+      "names -insert": "ML Pipeline Factory",
       "path -insert": "/projects/"
     },
     {
@@ -158,7 +158,7 @@
       "SEO description -text": "A locally hosted, agentic job-search pipeline built with n8n, Docker, and a local LLM (Ollama) that fetches, scores, and ranks daily job postings by dividing the work between deterministic rules and language-model judgment.",
       "html filename -insert": "job-search-pipeline",
       "md filename -insert": ", 2026-07-12",
-      "names -insert": "Job Search Pipeline, Job Search Pipeline",
+      "names -insert": "Job Search Pipeline",
       "path -insert": "/projects/"
     },
     {
@@ -176,7 +176,7 @@
       "SEO description -text": "This is an app I've written to demonstrate the Central Limit Theorem in statistics.  I use rolling dice as an example and take the sum of the faces. It is an interactive simulation that rolls `N` dice, `T` times where each roll is remembered and displayed.",
       "html filename -insert": "roll_dice",
       "md filename -insert": ", 2025-04-20",
-      "names -insert": "Roll Dice, Roll Dice",
+      "names -insert": "Roll Dice",
       "path -insert": "/projects/"
     },
     {
@@ -199,7 +199,7 @@
       "SEO description -text": "This is an app I wrote to demonstrate the Sieve of Eratosthenes.  It animates the algorithm, and the animation can be interacted with.  The app also has a module that generates what I call The Novelties.  This is a non-positional numbering system based on prime factorizations. Numbers are represented by their prime factorizations, but the primes are represented by their index in a list of primes.",
       "html filename -insert": "playing_with_primes",
       "md filename -insert": ", 2024-02-10",
-      "names -insert": "Primes, Primes",
+      "names -insert": "Primes",
       "path -insert": "/projects/"
     },
     {
@@ -211,7 +211,7 @@
       "SEO description -text": "404. Page not found.",
       "html filename -insert": "404",
       "md filename -insert": "",
-      "names -insert": "Null, 404",
+      "names -insert": "Null",
       "path -insert": ""
     },
     {
@@ -223,7 +223,7 @@
       "SEO description -text": "The Sieve of Eratosthenes is an ancient algorithm for finding prime numbers. It does not test for primality, but it is capable of generating a list of all prime numbers from 2 to `n` with only addition.",
       "html filename -insert": "eratosthenes",
       "md filename -insert": ", 2024-02-12",
-      "names -insert": " The Sieve of Eratosthenes,  The Sieve of Eratosthenes",
+      "names -insert": " The Sieve of Eratosthenes",
       "path -insert": "/articles/"
     },
     {
@@ -235,7 +235,7 @@
       "SEO description -text": "The Novelties are the integers represented with a non-positional number system.  Each integer is written as a concatenation of all prime factors in its prime factorization, including multiplicity.  The twist is that the primes are represented by their index in the set of  all primes.\nThe Novelties are ordered based on the length of their concatenation. Since primes are 'atomic', they are the smallest numbers. The largest numbers will always have the length of the largest power of 2 in the set.",
       "html filename -insert": "the_novelties",
       "md filename -insert": ", 2024-02-18",
-      "names -insert": "The Novelties, The Novelties",
+      "names -insert": "The Novelties",
       "path -insert": "/articles/"
     },
     {
@@ -247,7 +247,7 @@
       "SEO description -text": "The Central Limit Theorem is a theorem of huge importance in statistics. It says that if you sample an experiment enough times, then the average of those samples will be a normal random variable even if the random variable of the experiment itself was not normal.",
       "html filename -insert": "the_clt",
       "md filename -insert": ", 2024-04-20",
-      "names -insert": "The CLT, The Novelties",
+      "names -insert": "The CLT",
       "path -insert": "/articles/"
     },
     {
@@ -259,7 +259,7 @@
       "SEO description -text": "Page Template: ArticlePage",
       "html filename -insert": "article",
       "md filename -insert": "content",
-      "names -insert": "Article, Article",
+      "names -insert": "Article",
       "path -insert": "/articles/"
     },
     {
@@ -271,7 +271,7 @@
       "SEO description -text": "",
       "html filename -insert": "journals_from_sweden",
       "md filename -insert": ", 2024-08-12",
-      "names -insert": "Journals From Sweden, Journals From Sweden",
+      "names -insert": "Journals From Sweden",
       "path -insert": "/articles/"
     },
     {
@@ -294,7 +294,7 @@
       "SEO description -text": "A campus ad-posting database built for SQL Server and MySQL: EER modeling, BCNF normalization, constraint-driven integrity, and engineering around real cross-engine limitations.",
       "html filename -insert": "ad_posting_db",
       "md filename -insert": ", 2026-07-23",
-      "names -insert": "College Ad Posting Database, College Ad Posting Database",
+      "names -insert": "College Ad Posting Database",
       "path -insert": "/projects/"
     },
     {
@@ -306,7 +306,7 @@
       "SEO description -text": "Reference for AdPostingDB's stored procedures: registration, ad review and posting, board management, and messaging logic implemented in T-SQL for SQL Server.",
       "html filename -insert": "ad_posting_procedures",
       "md filename -insert": ", 2026-07-23",
-      "names -insert": "College Ad Posting Database - Procedures, College Ad Posting Database",
+      "names -insert": "Procedures - College Ad Posting Database",
       "path -insert": "/projects/ad_posting_db/"
     },
     {
@@ -318,7 +318,7 @@
       "SEO description -text": "Reference for AdPostingDB's view layer: board occupancy, review queues, expiry tracking, and reporting views that back the ad posting and review workflow in SQL Server.",
       "html filename -insert": "ad_posting_views",
       "md filename -insert": ", 2026-07-23",
-      "names -insert": "College Ad Posting Database - Views, College Ad Posting Database",
+      "names -insert": "Views - College Ad Posting Database",
       "path -insert": "/projects/ad_posting_db/"
     },
     {
@@ -330,7 +330,7 @@
       "SEO description -text": "A template file for the `app` page type. An app file has an app-container div thatt gets injected with any HTML the app needs.",
       "html filename -insert": "app",
       "md filename -insert": ", 2026-08-02",
-      "names -insert": "App Template, App Template",
+      "names -insert": "App Template",
       "path -insert": "/apps/"
     }
   ],

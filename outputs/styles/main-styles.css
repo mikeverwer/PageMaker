@@ -1,93 +1,98 @@
-/* Body & HTML styles */
+/* ====================================================================
+   Custom Properties
+   ==================================================================== */
 
-@font-face{
+:root {
+    /* Colors */
+    --color-bg-page:    #dcdcdc;
+    --color-bg-card:    #eaeaea;
+    --color-text:       #1b1b1b;
+    --color-accent:     #0047ab;
+    --color-accent-dim: #0047ab69;
+    --color-hover:      #ffffff55;
+    --color-shadow:     #333333aa;
+
+    /* Fonts */
+    --font-body:    'Rubik', Helvetica, Arial, sans-serif;
+    --font-heading: 'Franklin Gothic Medium', 'Arial Bold', Arial, sans-serif;
+    --font-mono:     monospace;
+    --font-display: 'Cambria', serif;
+
+    /* Layout */
+    --nav-width:       150px;
+    --content-max:     1200px;
+    --content-zen-max: 900px;
+}
+
+
+/* ====================================================================
+   Fonts
+   ==================================================================== */
+
+@font-face {
     src: url(/assets/fonts/Rubik-VariableFont_wght.ttf);
-    font-family: "Rubik", sans-serif;
+    font-family: 'Rubik';
     font-optical-sizing: auto;
     font-weight: 500;
     font-style: normal;
+}
+
+
+/* ====================================================================
+   Base
+   ==================================================================== */
+
+html {
+    scroll-behavior: smooth
 }
 
 body {
     display: flex;
     flex-flow: column nowrap;
     min-height: 100vh;
-    background-color: #dcdcdc;
+    background-color: var(--color-bg-page);
     background-image: url("/assets/images/background.png");
     background-attachment: scroll;
-    background-repeat: repeat;
-    font-family: 'Rubik', Helvetica, Arial, sans-serif;
+    background-repeat: repeat-y;
+    font-family: var(--font-body);
 }
 
-.container {
-    padding: 0 90px;
-}
 
-/* Keyboard button style */
+/* ====================================================================
+   Components
+   ==================================================================== */
+
+/* Keyboard glyph */
 kbd {
-  display: inline-block;
-  padding: 3px 5px;
-  font-size: 11px;
-  line-height: 10px;
-  color: #555;
-  vertical-align: middle;
-  background-color: #fcfcfc;
-  border: solid 1px #ccc;
-  border-bottom-color: #bbb;
-  border-radius: 3px;
-  box-shadow: inset 0 -1px 0 #bbb;
+    display: inline-block;
+    padding: 3px 5px;
+    font-size: 11px;
+    line-height: 10px;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fcfcfc;
+    border: solid 1px #ccc;
+    border-bottom-color: #bbb;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #bbb;
 }
 
-/* Fixed-Position Button styles */
 
-button#toggle-sidebars{
-    position: fixed;
-    top: 96px;
-    right: 14px;
-    padding: 8px 10px 12px 10px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1.75rem;
-    justify-content: center;
-    width: 62px;
-    font-family: "Cambria", "serif" ;
-}
-
-button#toggle-sidebars:hover {
-    background-color: #ffffff55;
-}
-
-.panel-toggle-area {
-    position: fixed;
-    top: 160px;
-    bottom: 55px;
-    width: 64px;
-    cursor: pointer;
-    z-index: 1;  /* Ensure the toggle area is above other elements */
-}
-
-.panel-toggle-area:hover {
-    background-color: #ffffff55;
-}
-
-.panel-toggle-area#right-side {
-    right: 0;
-}
-
-.panel-toggle-area#left-side {
-    left: 0;
-}
-
-/* Header styles */
+/* ====================================================================
+   Header
+   ==================================================================== */
 
 header {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Bold', Arial, sans-serif;
-    padding: 0 90px;
+    padding: 0 100px;
+    font-family: var(--font-heading);
+}
+
+header h1 {
+    font-size: 64px;
 }
 
 header a {
@@ -98,10 +103,6 @@ header a {
 header a:hover {
     cursor: cell;
     color: white;
-}
-
-header h1{
-    font-size: 64px;
 }
 
 header #home-button {
@@ -118,131 +119,312 @@ header #home-button:hover {
     background-color: white;
 }
 
-/* Main Section styles */
+
+/* ====================================================================
+   Layout
+   ==================================================================== */
+
+.container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    padding: 10px 100px;
+}
 
 .main-section {
     display: flex;
-    flex-flow: row nowrap;
-    padding: 10px;
+    flex: 1;
+    flex-flow: column nowrap;
     justify-content: space-between;
+    align-items: center;
+    min-width: 0;
+    max-width: 100vw;
+    padding: 10px;
+    transition: max-width 0.3s ease;
 }
 
+
+/* ====================================================================
+   Article
+   ==================================================================== */
+
 article {
-    flex: 1 1 1200px;
-    background-color: #eaeaea;
+    flex: 1 1;
+    width: 100%;
+    max-width: var(--content-max);
     padding: 40px 40px;
-    /* max-width: 1200px; */
+    background-color: var(--color-bg-card);
     overflow: scroll;
 }
 
 article a {
-    color: #0047ab;
+    color: var(--color-accent);
 }
 
-#article-date{
-  font-size: 0.8em;
-  margin-top: 64px;
-  margin-bottom: 0;
-  float: right;
-  text-decoration: overline;
-  color: #0047ab69;
+#article-date {
+    float: right;
+    margin-top: 64px;
+    margin-bottom: 0;
+    font-size: 0.8em;
+    text-decoration: overline;
+    color: var(--color-accent-dim);
 }
 
-/* Nav Styles */
+
+/* ====================================================================
+   Navigation
+   ==================================================================== */
 
 nav ul {
     list-style: none;
 }
 
-nav.horizontal-nav#main-links {
-    box-shadow: 0px 3px 4px -4px #333333aa;
-}
-
-nav.horizontal-nav ul {
-    display: flex;
-    flex-flow: row wrap;
-    width: 100%;
-    justify-content: space-evenly;
-}
-
-nav.horizontal-nav#main-links li {
-    text-align: center;
-    font-size: 1em;
-}
-
-nav.horizontal-nav#side-links ul {
-    padding-top: 5px;
-}
-
-nav.horizontal-nav#side-links li {
-    text-align: center;
-    text-decoration: underline #0047ab;
-    font-size: 0.9em;
-    /* width: 100%; */
-}
-
-nav.horizontal-nav a {
-    padding: 2px 4px;
-    display: block;
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
-    width: 100%;
-}
-
-nav.horizontal-nav a:active {
-    background-color: #eaeaea;
-}
-
+/* Vertical (desktop sidebar) navigation */
 nav.vertical-nav {
+    flex: 0 0 var(--nav-width);
     padding-top: 32px;
-    flex: 0 0 150px;
     font-size: 1.5em;
-    color: #1b1b1b;
     font-weight: bold;
-}
-
-nav#rightNav {
-    text-align: right;
-    font-size: 1.25em;
-    justify-content: right;
+    color: var(--color-text);
+    overflow: hidden;
+    transition: opacity   0.25s ease,
+                transform 0.25s ease,
+                flex-basis 0.3s ease;
 }
 
 nav.vertical-nav li {
-    padding: 5px 0;
+    padding: 0;
 }
 
 nav.vertical-nav a {
-    padding: 10px 0;
+    display: block;
+    padding: 12px 16px;
     text-decoration: none;
     color: black;
 }
 
 nav.vertical-nav a:hover {
-    color: white;
     cursor: cell;
+    color: var(--color-accent);
+    background-color: var(--color-hover);
 }
 
-/* Footer styles */
-
-.vspace {
-    min-height: auto;
-    flex-grow: 1;
+nav#leftNav {
+    margin-right: 10px;
 }
+
+nav#rightNav {
+    text-align: right;
+    font-size: 1.25em;
+    margin-left: 10px;
+}
+
+nav#rightNav a {
+    padding: 8px 10px 14px;
+    border-bottom: 1px solid var(--color-accent-dim);
+}
+
+nav#rightNav li:last-child a {
+    border-bottom: none;
+    padding-bottom: 8px;
+}
+
+/* Horizontal (mobile) navigation — hidden by default, shown via media query */
+nav.horizontal-nav {
+    display: none;
+}
+
+nav.horizontal-nav ul {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+nav.horizontal-nav a {
+    display: block;
+    width: 100%;
+    padding: 2px 4px;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+nav.horizontal-nav a:active {
+    background-color: var(--color-bg-card);
+}
+
+#main-links {
+    box-shadow: 0px 3px 4px -4px var(--color-shadow);
+}
+
+#main-links li {
+    font-size: 1em;
+    text-align: center;
+}
+
+#side-links ul {
+    padding-top: 5px;
+}
+
+#side-links li {
+    font-size: 0.9em;
+    text-align: center;
+    text-decoration: underline var(--color-accent);
+}
+
+nav a.current {
+    text-decoration: underline var(--color-accent) 2px;
+}
+
+
+/* ====================================================================
+   Zen Mode
+   ==================================================================== */
+
+#toggle-sidebars {
+    position: fixed;
+    top: 90px;
+    right: 14px;
+    width: 62px;
+    padding: 8px 10px 12px 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    transition: transform 0.3s ease;
+}
+
+#toggle-sidebars:hover {
+    background-color: var(--color-hover);
+}
+
+#toggle-sidebars.flipping {
+    transform: rotateY(90deg);
+}
+
+/* Hidden-nav state: collapses flex-basis to 0 (continuous, animatable)
+   while fading and sliding outward. */
+nav.vertical-nav.hiding {
+    opacity: 0;
+    flex-basis: 0;
+    pointer-events: none;
+}
+
+nav.vertical-nav.hiding#leftNav {
+    transform: translateX(-20px);
+}
+
+nav.vertical-nav.hiding#rightNav {
+    transform: translateX(20px);
+}
+
+/* Narrow main-section for comfortable reading width */
+.container.zen .main-section {
+    max-width: var(--content-zen-max);
+    margin-inline: auto;
+}
+
+
+/* ====================================================================
+   Table of Contents (floating)
+   ==================================================================== */
+
+/* Toggle button — mirrors #toggle-sidebars, sits just below it */
+#toggle-toc {
+    position: fixed;
+    top: 160px;
+    right: 14px;
+    width: 62px;
+    padding: 8px 10px 12px 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    transition: transform 0.3s ease;
+}
+
+#toggle-toc:hover {
+    background-color: var(--color-hover);
+}
+
+#toggle-toc[aria-expanded="true"] {
+    color: var(--color-accent);
+}
+
+/* The panel */
+#toc-panel {
+    position: fixed;
+    top: 225px;
+    right: 14px;
+    z-index: 20;
+    max-width: 280px;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 16px 20px;
+    background-color: var(--color-bg-card);
+    box-shadow: 0 4px 12px -2px var(--color-shadow);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#toc-panel.toc-hidden {
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+}
+
+#toc-panel ul {
+    list-style: none;
+    text-align: right;
+}
+
+#toc-panel li {
+    padding: 4px 0;
+}
+
+#toc-panel a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+#toc-panel a:hover {
+    cursor: cell;
+    color: var(--color-accent);
+}
+
+/* h3 entries indented (visually, on the right that means padding-right) */
+#toc-panel li.toc-h3 {
+    padding-right: 16px;
+    font-size: 0.9em;
+    font-weight: normal;
+}
+
+
+/* ====================================================================
+   Footer
+   ==================================================================== */
 
 footer {
-    padding: 0 16px;
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: center;
+    padding: 0 16px;
+    color: var(--color-text);
+    font-family: var(--font-mono);
     font-size: 10px;
-    font-family: monospace;
-    color: #1b1b1b;
+}
+
+.vspace {
+    flex-grow: 1;
+    min-height: auto;
 }
 
 .author {
-    background-color:#dcdcdc;
+    background-color: var(--color-bg-page);
 }
 
 .secret-container {
@@ -263,8 +445,7 @@ footer {
 img.bottom-right-image {
     box-sizing: content-box;
     height: 20px;
-    margin: 4px;
-    margin-left: 10px;
+    margin: 4px 4px 4px 10px;
     padding: 4px 6px;
 }
 
@@ -273,10 +454,12 @@ img.bottom-right-image:hover {
     background-color: white;
 }
 
-/* Mobile Styles */
 
-@media only screen and (max-width: 810px) {
-    
+/* ====================================================================
+   Mobile (≤810px)
+   ==================================================================== */
+
+@media (max-width: 810px) {
     body {
         background-size: 1000px 5000px;
     }
@@ -286,30 +469,14 @@ img.bottom-right-image:hover {
         padding: 0;
     }
 
+    header h1 {
+        padding-right: 10px;
+        font-size: 2.5em;
+    }
+
     header #home-button {
         height: 60px;
         background-color: white;
-    }
-    
-    header h1 {
-        font-size: 2.5em;
-        padding-right: 10px;
-    }
-
-    nav.horizontal-nav {
-        display: block;
-    }
-
-    nav.vertical-nav {
-        display: none;
-    }
-
-    #toggle-sidebars {
-        display: none;
-    }
-
-    .panel-toggle-area {
-        display: none;
     }
 
     .container {
@@ -324,25 +491,22 @@ img.bottom-right-image:hover {
         font-size: 2em;
     }
 
-
-
-
-}
-
-@media only screen and (min-width: 811px) {
-    nav.horizontal-nav {
+    /* Swap navigation: hide vertical, show horizontal */
+    nav.vertical-nav {
         display: none;
     }
 
-    nav.vertical-nav {
+    nav.horizontal-nav {
         display: block;
     }
 
+    /* Desktop-only chrome */
+    #toggle-sidebars {
+        display: none;
+    }
+
+    #toggle-toc,
+    #toc-panel {
+        display: none;
+    }
 }
-
-
-/* Debugging */ 
-
-/* * {
-    border: thin dotted red;
-} */
