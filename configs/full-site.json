@@ -89,7 +89,7 @@
       ],
       "priority -insert": "0.6",
       "SEO index -set": 1,
-      "SEO follow -set": 0,
+      "SEO follow -set": 1,
       "SEO description -text": "A tools-and-automation portfolio spanning mathematical visualization, applied data projects, and workflow automation.",
       "html filename -insert": "projects",
       "md filename -insert": ", 2026-07-12",
@@ -172,7 +172,7 @@
       ],
       "priority -insert": "0.6",
       "SEO index -set": 1,
-      "SEO follow -set": 0,
+      "SEO follow -set": 1,
       "SEO description -text": "This is an app I've written to demonstrate the Central Limit Theorem in statistics.  I use rolling dice as an example and take the sum of the faces. It is an interactive simulation that rolls `N` dice, `T` times where each roll is remembered and displayed.",
       "html filename -insert": "roll_dice",
       "md filename -insert": ", 2025-04-20",
@@ -195,7 +195,7 @@
       ],
       "priority -insert": "0.6",
       "SEO index -set": 1,
-      "SEO follow -set": 0,
+      "SEO follow -set": 1,
       "SEO description -text": "This is an app I wrote to demonstrate the Sieve of Eratosthenes.  It animates the algorithm, and the animation can be interacted with.  The app also has a module that generates what I call The Novelties.  This is a non-positional numbering system based on prime factorizations. Numbers are represented by their prime factorizations, but the primes are represented by their index in a list of primes.",
       "html filename -insert": "playing_with_primes",
       "md filename -insert": ", 2024-02-10",
@@ -290,7 +290,7 @@
       ],
       "priority -insert": "0.6",
       "SEO index -set": 1,
-      "SEO follow -set": 0,
+      "SEO follow -set": 1,
       "SEO description -text": "A campus ad-posting database built for SQL Server and MySQL: EER modeling, BCNF normalization, constraint-driven integrity, and engineering around real cross-engine limitations.",
       "html filename -insert": "ad_posting_db",
       "md filename -insert": ", 2026-07-23",
@@ -336,7 +336,7 @@
   ],
   "project_data": {
     "root": "D:/Projects/Code/Website/mikeverwer.github.io",
-    "template": "D:/Projects/Code/Website/mikeverwer.github.io/teaching.html",
+    "template": "D:/Projects/Code/Website/mikeverwer.github.io/index.html",
     "robots": "User-agent: *\nDisallow: /assets/docs/*.pdf\nDisallow: /assets/images/\nDisallow: /private/\nDisallow: *.md\nDisallow: /page.html\nDisallow: /article.html\n\nSitemap: https://mikeverwer.github.io/sitemap.xml"
   }
 }

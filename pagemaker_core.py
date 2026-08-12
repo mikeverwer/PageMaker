@@ -49,6 +49,7 @@ class PersonalSitePage:
             self.step = self.change_title(new_title=new_title)
             # self.step = self.change_header(new_header=new_header, output_filename=output_filename)  # Deprecated
             self.step = self.change_article(output_filename=output_filename, md_filename=md_filename, page_type=page_type)
+            self.step = self.remove_app(page_type=page_type)
             self.step = self.add_app(page_type=page_type, root=root, output_filename=output_filename)
             self.step = self.add_links(links=links)           
             self.step = self.clean_links(page_type=page_type)
@@ -159,6 +160,16 @@ class PersonalSitePage:
             except Exception as e:
                 self.log("No date tag to edit, continuing.")
 
+        return self.step + 1
+
+
+    def remove_app(self, page_type):
+        self.log("    Checking for an app to remove...", end=" ")
+        try:
+            self.soup.find("div", id="app-container").decompose()
+            self.log("App found in the template, removed.")
+        except Exception as e:
+            self.log("No app was found in the template.")
         return self.step + 1
     
     
