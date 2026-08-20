@@ -100,8 +100,14 @@
       "type -set": "Main",
       "links": [
         {
+          "label": "Data Analytics Resume",
+          "url": "/assets/docs/DataResume.pdf",
+          "target": "_blank"
+        },
+        {
           "label": "Bergman's Condition and Near-Unanimity Terms",
-          "url": "/assets/docs/masters_thesis.pdf"
+          "url": "/assets/docs/masters_thesis.pdf",
+          "target": "_blank"
         }
       ],
       "priority -insert": "0.75",
@@ -109,7 +115,7 @@
       "SEO follow -set": 0,
       "SEO description -text": "Mike Verwer holds a Master's in Mathematics from McMaster University and taught math and statistics for six years before moving into data analytics and engineering.",
       "html filename -insert": "about",
-      "md filename -insert": ", 2026-07-17",
+      "md filename -insert": ", 2026-08-20",
       "names -insert": "About Me",
       "path -insert": ""
     },

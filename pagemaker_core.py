@@ -163,13 +163,23 @@ class PersonalSitePage:
         return self.step + 1
 
 
-    def remove_app(self, page_type):
+    def remove_app(self):
         self.log("    Checking for an app to remove...", end=" ")
-        try:
-            self.soup.find("div", id="app-container").decompose()
-            self.log("App found in the template, removed.")
-        except Exception as e:
-            self.log("No app was found in the template.")
+
+        app_container = self.soup.find("div", id="app-container")
+        if app_container:
+            app_container.decompose()
+
+        app_scripts = self.soup.find_all("script", class_="app-script")
+        for script in app_scripts:
+            script.decompose()
+
+        app_styles = self.soup.find_all("link", rel="stylesheet", class_="app-styles")
+        for style in app_styles:
+            style.decompose()
+
+        self.log("All app elements removed.")
+
         return self.step + 1
     
     
@@ -222,12 +232,18 @@ class PersonalSitePage:
             with open(f"{local_asset_directory}/deps.txt", "r") as deps_file:
                 for dep in deps_file:
                     link = dep.strip()
-                    deps.insert(0, self.soup.new_tag("script", src=link))
+                    deps.insert(0, self.soup.new_tag(
+                        "script", 
+                        src=link, attrs={'class': "app-script"}))
         except FileNotFoundError:
             self.log(f"No dependencies found...", end=' ')
 
         # add app javascript
-        deps.insert(0, self.soup.new_tag("script", src=f"{relative_asset_path}.js"))
+        deps.insert(0, self.soup.new_tag(
+                "script", 
+                src=f"{relative_asset_path}.js",
+                attrs={'class': "app-script"}
+            ))
         
         try:
             last_script = scripts[-1]
@@ -242,12 +258,14 @@ class PersonalSitePage:
         app_style_tag = self.soup.new_tag(
                 "link", 
                 rel="stylesheet", 
-                href=f'{relative_asset_path}.css')
+                href=f'{relative_asset_path}.css',
+                attrs={'class': "app-styles"}
+            )
         try:
             styles = head_tag.find_all("link", rel="stylesheet")
             last_style = styles[-1]
             last_style.insert_after(app_style_tag)
-        except Exception:
+        except IndexError:
             title_tag = head_tag.find("title")
             title_tag.insert_before(app_style_tag)
 
@@ -277,7 +295,7 @@ class PersonalSitePage:
                 nav_tag.append(ul_tag)
             else:   # remove any links from the template page
                 for li_tag in ul_tag.find_all("li"):
-                    li_tag.extract()
+                    li_tag.decompose()
 
             for link in links:
                 ul_tag.append(self._build_link_li(link))
@@ -304,7 +322,7 @@ class PersonalSitePage:
             empty_links = self.soup.find_all('li', lambda tag: tag.find('a', href=''))
             if empty_links:
                 for li_tag in empty_links:
-                    li_tag.extract()
+                    li_tag.decompose()
                 self.log("empty links removed.", end=".. ")
         except:
             self.log(f"no empty links.", end=".. ")
@@ -313,7 +331,7 @@ class PersonalSitePage:
             try:
                 all_links = self.soup.find_all('li')
                 for li_tag in all_links:
-                    li_tag.extract()
+                    li_tag.decompose()
                 self.log("all page links removed.")
             except:
                 self.log(f"no links in the template.")
