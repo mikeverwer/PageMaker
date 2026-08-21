@@ -43,16 +43,10 @@ def build(config_path: str, root_override: str = None, template_override: str = 
 
         md_filename = (page.get("md filename -insert") or "").strip() or None
         description = (page.get("SEO description -text") or "").strip()
-
-        names = (page.get("names -insert") or "").split(", ")
-        title = names[0] if names and names[0] else None
-        header = names[1] if len(names) > 1 else None
-
+        title = (page.get("names -insert") or "").strip() or None
         page_path = (page.get("path -insert") or "").strip() or "/"
-
         priority_raw = (page.get("priority -insert") or "").strip()
         priority = float(priority_raw) if priority_raw else None
-
         links = page.get("links") or None
         index = page.get("SEO index -set", 0)
         follow = page.get("SEO follow -set", 0)
@@ -65,7 +59,6 @@ def build(config_path: str, root_override: str = None, template_override: str = 
             md_filename=md_filename,
             description=description,
             new_title=title,
-            new_header=header,
             path_to_page=page_path,
             links=links,
             index=index,

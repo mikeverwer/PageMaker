@@ -994,54 +994,39 @@ class PageMaker:
         for i, row in enumerate(self.input_rows):
             row: InputRow
             self.log("Gathering inputs...")
-            page_type: str = row.page_type.get()
-            SEO_priority: str = row.priority_entry.get()
-            html_filename: str = row.html_filename_entry.get()
-            md_filename: str = row.md_filename_entry.get()
-            md_filename: str = None if md_filename == "" else md_filename
-            description: str = row.description_text.get('1.0', 'end-1c').strip()
-            names: list = row.names_entry.get().split(", ")
-            if html_filename == '':
+
+            html_filename = row.html_filename_entry.get().strip()
+            if not html_filename:
                 self.log(f"  Input Error.  Missing: HTML Filename in input row {i + 1}. Skipping attempt.")
                 continue
-            else:
-                if len(html_filename.split('.')) > 1:
-                    html_filename = html_filename.split('.')[0]
-            if SEO_priority == "":
-                SEO_priority = None
-            else: 
-                SEO_priority = float(SEO_priority)
-            if names == ['']:
-                self.log(f"  No Names input in the '{html_filename}' row, attempting to make the page anyway.")
-                title = None
-            else:
-                title = names[0]
-            if len(names) < 2:
-                header = None
-            else: 
-                header = names[1]
-            page_path = row.path_entry.get()
-            if page_path == "":
-                page_path = '/'
-                self.log(f"  The path-to-page in the '{html_filename}' row was blank, attempting to make the page anyway.")                
-            links = row.links
-            if links == []:
-                links = None 
-            SEO_index = row.SEO_index.get()
-            SEO_follow = row.SEO_follow.get()
-            self.log(f"  Attempting to build {html_filename}.html... ")
+            html_filename = html_filename.split('.')[0]
+
+            title = row.names_entry.get().strip() or None
+            if not title:
+                self.log(f"  No title in row {i + 1}, attempting to make the page anyway.")
+
+            md_filename = row.md_filename_entry.get().strip() or None
+            page_type = row.page_type.get()
+            priority_raw = row.priority_entry.get().strip()
+            priority = float(priority_raw) if priority_raw else None
+            page_path = row.path_entry.get().strip() or "/"
+            links = row.links or None
+            index = row.SEO_index.get()
+            follow = row.SEO_follow.get()
+            description: str = row.description_text.get('1.0', 'end-1c').strip()
+
+            self.log(f"  Attempting to build row {i + 1}: {html_filename}.html... ")
             page = PersonalSitePage(
                 template_file_path=template_file, 
                 output_filename=html_filename, 
                 md_filename=md_filename, 
                 description=description,
                 new_title=title, 
-                new_header=header, 
                 path_to_page=page_path, 
                 links=links, 
-                index=SEO_index, 
-                priority=SEO_priority, 
-                follow=SEO_follow, 
+                index=index, 
+                priority=priority, 
+                follow=follow, 
                 write_to_path=self.write_to_path.get(), 
                 root=root_path, 
                 page_type=page_type,

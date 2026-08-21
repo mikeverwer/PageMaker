@@ -21,7 +21,7 @@ import html_reformat
 
 class PersonalSitePage:
     def __init__(self, template_file_path: str = "default_page.html", md_filename: str = None, output_filename: str = "output",
-                    description: str = '', new_title: str = "page", new_header: str = "Page", path_to_page: str = "/dir", 
+                    description: str = '', new_title: str = "page", path_to_page: str = "/dir", 
                     links: list[dict] = None, index: int = 0, follow: int = 0, priority: float = 0.6,
                     write_to_path: bool = False, root: str = "outputs", page_type: str = 'Main', logger=None):
         self.step = 1
@@ -49,7 +49,7 @@ class PersonalSitePage:
             self.step = self.change_title(new_title=new_title)
             # self.step = self.change_header(new_header=new_header, output_filename=output_filename)  # Deprecated
             self.step = self.change_article(output_filename=output_filename, md_filename=md_filename, page_type=page_type)
-            self.step = self.remove_app(page_type=page_type)
+            self.step = self.remove_app()
             self.step = self.add_app(page_type=page_type, root=root, output_filename=output_filename)
             self.step = self.add_links(links=links)           
             self.step = self.clean_links(page_type=page_type)
